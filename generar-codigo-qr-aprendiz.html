@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Código de Ingreso QR</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="css/generar-codigo-qr-aprendiz.css">
+</head>
+<body>
+    <div class="modal-overlay">
+        <div class="modal-container">
+            <div class="modal-header">
+                <div class="header-content">
+                    <div class="header-icon">
+                        <i class="fas fa-qrcode"></i>
+                    </div>
+                    <span>Soft-In</span>
+                </div>
+                <button class="close-button" onclick="goBack()" aria-label="Cerrar">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            
+            <div class="modal-body">
+                <div class="qr-container">
+                    <div class="qr-wrapper">
+                        <div class="qr-code"></div>
+                        <div class="qr-overlay">
+                            <i class="fas fa-check"></i>
+                        </div>
+                    </div>
+                </div>
+                
+                <h2 class="title">CÓDIGO DE INGRESO</h2>
+                <p class="subtitle">Escanea el código QR para acceder al sistema</p>
+                
+                <div class="info-cards">
+                    <div class="info-card">
+                        <div class="info-card-title">Válido hasta</div>
+                        <div class="info-card-value" id="expiry-time">15:30</div>
+                    </div>
+                    <div class="info-card">
+                        <div class="info-card-title">Código ID</div>
+                        <div class="info-card-value">#QR2024</div>
+                    </div>
+                </div>
+                
+                <div class="action-buttons">
+                    <button class="btn btn-primary" onclick="refreshQR()">
+                        <i class="fas fa-sync-alt"></i>
+                        Renovar
+                    </button>
+                    <button class="btn btn-secondary" onclick="shareQR()">
+                        <i class="fas fa-share-alt"></i>
+                        Compartir
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/generar-codigo-qr-aprendiz.js"></script>
+</body>
+</html>
