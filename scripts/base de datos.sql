@@ -1,0 +1,77 @@
+-- Script para poblar la base de datos con usuarios de ejemplo
+-- Ejecutar después de crear la estructura de la base de datos
+
+-- Insertar usuarios de ejemplo con diferentes roles
+INSERT INTO persona (nombre_completo, documento, tipo_documento, rol, programa_formacion, no_ficha, estado_formacion, contrasena) VALUES
+-- Enfermeras
+('María García López', '12345678', 'CC', 'enfermera', 'Auxiliar de Enfermería', 'ENF001', 'Activo', '$2b$10$rQJ5qP8YgF7mK9nL3sT4vOHxY2wE6rR8tA5bC9dF3gH7jK1mN4pQ6s'),
+('Ana López Martínez', '11111111', 'CC', 'enfermera', 'Técnico en Enfermería', 'ENF002', 'Activo', '$2b$10$rQJ5qP8YgF7mK9nL3sT4vOHxY2wE6rR8tA5bC9dF3gH7jK1mN4pQ6s'),
+('Carmen Rodríguez Silva', '33333333', 'CC', 'enfermera', 'Auxiliar de Enfermería', 'ENF003', 'Activo', '$2b$10$rQJ5qP8YgF7mK9nL3sT4vOHxY2wE6rR8tA5bC9dF3gH7jK1mN4pQ6s'),
+
+-- Aprendices
+('Andres Felipe Montiel Guerra', '1003046497', 'CC', 'aprendiz', 'Analisis y desarrollo de software', '2924039', 'Activo', '$2b$10$rQJ5qP8YgF7mK9nL3sT4vOHxY2wE6rR8tA5bC9dF3gH7jK1mN4pQ6s'),
+('Laura Martínez Ruiz', '22222222', 'CC', 'aprendiz', 'Auxiliar de Enfermería', '2758494', 'Activo', '$2b$10$rQJ5qP8YgF7mK9nL3sT4vOHxY2wE6rR8tA5bC9dF3gH7jK1mN4pQ6s'),
+('Carlos Sánchez Torres', '44444444', 'CC', 'aprendiz', 'Técnico en Contabilidad', '2758495', 'Activo', '$2b$10$rQJ5qP8YgF7mK9nL3sT4vOHxY2wE6rR8tA5bC9dF3gH7jK1mN4pQ6s'),
+('Diana Morales Castro', '55555555', 'CC', 'aprendiz', 'Auxiliar de Enfermería', '2758496', 'Activo', '$2b$10$rQJ5qP8YgF7mK9nL3sT4vOHxY2wE6rR8tA5bC9dF3gH7jK1mN4pQ6s'),
+
+-- Personal de Bienestar
+('Roberto Jiménez Vargas', '66666666', 'CC', 'bienestar', 'Psicología', 'BIE001', 'Activo', '$2b$10$rQJ5qP8YgF7mK9nL3sT4vOHxY2wE6rR8tA5bC9dF3gH7jK1mN4pQ6s'),
+('Patricia Herrera Luna', '77777777', 'CC', 'bienestar', 'Trabajo Social', 'BIE002', 'Activo', '$2b$10$rQJ5qP8YgF7mK9nL3sT4vOHxY2wE6rR8tA5bC9dF3gH7jK1mN4pQ6s'),
+
+-- Vigilantes
+('Miguel Ángel Ramírez', '88888888', 'CC', 'vigilante', 'Seguridad y Vigilancia', 'VIG001', 'Activo', '$2b$10$rQJ5qP8YgF7mK9nL3sT4vOHxY2wE6rR8tA5bC9dF3gH7jK1mN4pQ6s'),
+('Fernando Castro Díaz', '99999999', 'CC', 'vigilante', 'Seguridad y Vigilancia', 'VIG002', 'Activo', '$2b$10$rQJ5qP8YgF7mK9nL3sT4vOHxY2wE6rR8tA5bC9dF3gH7jK1mN4pQ6s'),
+
+-- Administrativos
+('Sandra Mejía Ospina', '10101010', 'CC', 'administrativo', 'Administración', 'ADM001', 'Activo', '$2b$10$rQJ5qP8YgF7mK9nL3sT4vOHxY2wE6rR8tA5bC9dF3gH7jK1mN4pQ6s'),
+('Andrés Felipe Gómez', '20202020', 'CC', 'administrativo', 'Sistemas', 'ADM002', 'Activo', '$2b$10$rQJ5qP8YgF7mK9nL3sT4vOHxY2wE6rR8tA5bC9dF3gH7jK1mN4pQ6s');
+
+-- Insertar algunos registros de historial de ejemplo
+INSERT INTO historial_ingreso (id_persona, fecha_ingreso, hora_ingreso, observacion) VALUES
+(2, '2024-01-15', '07:30:00', 'Ingreso normal'),
+(4, '2024-01-15', '08:00:00', 'Ingreso normal'),
+(5, '2024-01-15', '08:15:00', 'Ingreso normal'),
+(2, '2024-01-14', '07:45:00', 'Ingreso normal'),
+(4, '2024-01-14', '08:10:00', 'Llegada tardía');
+
+-- Insertar algunos permisos de ejemplo
+INSERT INTO permiso (id_persona, fecha_solicitud, motivo, estado) VALUES
+(2, '2024-01-10', 'Cita médica', 'Aprobado'),
+(4, '2024-01-12', 'Diligencias personales', 'Pendiente'),
+(5, '2024-01-13', 'Emergencia familiar', 'Aprobado');
+
+-- Insertar algunos reportes médicos de ejemplo
+INSERT INTO reporte_medico (id_persona, descripcion, fecha) VALUES
+(2, 'Revisión médica general - Sin novedades', '2024-01-08'),
+(4, 'Control de presión arterial - Normal', '2024-01-10'),
+(5, 'Evaluación nutricional - Recomendaciones dietéticas', '2024-01-12');
+
+-- Insertar algunas valoraciones de enfermería
+INSERT INTO enfermera_valoracion (id_enfermera, id_aprendiz, id_reporte) VALUES
+(1, 2, 1),
+(1, 4, 2),
+(3, 5, 3);
+
+-- Insertar algunos códigos QR de ejemplo
+INSERT INTO aprendiz_qr (id_persona, codigo_qr, fecha_generado) VALUES
+(2, 'QR_JUAN_20240115_001', '2024-01-15'),
+(4, 'QR_LAURA_20240115_001', '2024-01-15'),
+(5, 'QR_CARLOS_20240115_001', '2024-01-15');
+
+-- Insertar lecturas de QR por bienestar
+INSERT INTO bienestar_leer_qr (id_bienestar, id_aprendiz, fecha_lectura) VALUES
+(8, 2, '2024-01-15'),
+(9, 4, '2024-01-15'),
+(8, 5, '2024-01-15');
+
+-- Insertar lecturas de QR por vigilantes
+INSERT INTO vigilante_leer_qr (id_vigilante, id_aprendiz, fecha_lectura) VALUES
+(10, 2, '2024-01-15'),
+(11, 4, '2024-01-15'),
+(10, 5, '2024-01-15');
+
+-- Insertar registros de usuario
+INSERT INTO registro_usuario (id_administrativo, id_persona, fecha_registro) VALUES
+(12, 2, '2024-01-01'),
+(13, 4, '2024-01-01'),
+(12, 5, '2024-01-01');
