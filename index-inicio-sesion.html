@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Soft-In - Iniciar Sesión</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="css/index-inicio-sesion.css">
+</head>
+<body>
+    <div class="login-container">
+        <div class="logo-section">
+            <h1 class="logo-title">Soft-In</h1>
+            <p class="logo-subtitle">SOFTWARE</p>
+        </div>
+
+        <form id="loginForm" method="post" action="controlador.php">
+            <div class="error-message" id="errorMessage"></div>
+            <div class="success-message" id="successMessage"></div>
+
+            <div class="form-group">
+                <input 
+                    type="text" 
+                    id="documento"
+                    name="documento"
+                    class="form-input" 
+                    placeholder="Documento de Identidad"
+                    required
+                    autocomplete="username"
+                >
+            </div>
+
+            <div class="form-group">
+                <div class="password-wrapper">
+                    <input 
+                        type="password" 
+                        id="password"
+                        name="password"
+                        class="form-input" 
+                        placeholder="Contraseña"
+                        required
+                        autocomplete="current-password"
+                        aria-describedby="togglePassword"
+                    >
+                    <button type="button" id="togglePassword" class="toggle-password" aria-label="Mostrar contraseña" title="Mostrar contraseña">
+                        <i class="fa-regular fa-eye"></i>
+                    </button>
+                </div>
+            </div>
+            <button type="submit" class="login-button" name="login-button" id="loginBtn">
+                Iniciar Sesión
+            </button>
+        </form>
+    </div>
+
+    <!-- <script src="js/database.js"></script>
+    <script src="js/index-inicio-sesion.js"></script> -->
+</body>
+</html>

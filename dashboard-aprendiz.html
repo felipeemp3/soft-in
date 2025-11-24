@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Soft-In</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="css/dashboard-aprendiz.css">
+</head>
+<body>
+    <!-- Loading Overlay -->
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="loading-spinner"></div>
+    </div>
+
+    <!-- Header -->
+    <header class="header">
+        <div class="header-left">
+            <div class="logo-icon">
+                <i class="fas fa-graduation-cap"></i>
+            </div>
+            <div>
+                <div class="logo-text">Soft-In</div>
+                <div class="logo-subtitle">SOFTWARE</div>
+            </div>
+        </div>
+        <div class="header-center">
+            APRENDIZ
+        </div>
+        <div class="header-right">
+            <div class="user-avatar" onclick="showUserMenu()"> 
+                <i class="fas fa-user"></i>
+            </div>
+            <button class="menu-button" onclick="showMainMenu()">
+                <i class="fas fa-bars"></i>
+            </button>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <!-- Left Section -->
+        <div class="left-section">
+            <!-- Welcome Section -->
+            <div class="welcome-section">
+                <h1 class="welcome-title" id="welcomeMessage">Hola, Aprendiz</h1>
+                <p class="welcome-subtitle">Bienvenido a tu panel de control. Aquí puedes gestionar tus códigos, permisos y revisar tu historial.</p>
+                
+                <!-- Action Buttons -->
+                <div class="action-buttons">
+                    <button class="action-btn" onclick="generateCode()">
+                        <i class="fas fa-qrcode"></i>
+                        Generar Código
+                    </button>
+                    <button class="action-btn" onclick="generatePermission()">
+                        <i class="fas fa-file-alt"></i>
+                        Generar Permiso
+                    </button>
+                    <button class="action-btn" onclick="viewHistory()">
+                        <i class="fas fa-history"></i>
+                        Historial
+                    </button>
+                </div>
+            </div>
+
+            <!-- Stats Section -->
+            <div class="stats-section">
+                <div class="stat-item">
+                    <div class="stat-number" id="codesGenerated">0</div>
+                    <div class="stat-label">Códigos Generados</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number" id="permissionsActive">0</div>
+                    <div class="stat-label">Permisos Activos</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number" id="daysActive">0</div>
+                    <div class="stat-label">Días Activo</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Section - Image Gallery -->
+        <div class="right-section">
+            <div class="image-card">
+                <img src="img/image4.jpg" alt="Estudiantes colaborando">
+                <div class="image-caption">Trabajo en Equipo</div>
+            </div>
+            <div class="image-card">
+                <img src="img/image1.jpg" alt="Aprendizaje digital">
+                <div class="image-caption">Aprendizaje Digital</div>
+            </div>
+            <div class="image-card">
+                <img src="img/image2.jpeg" alt="Formación práctica">
+                <div class="image-caption">Formación Práctica</div>
+            </div>
+            <div class="image-card">
+                <img src="img/image3.jpg" alt="Desarrollo profesional">
+                <div class="image-caption">Desarrollo Profesional</div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Modal Overlay -->
+    <div class="modal-overlay" id="modalOverlay">
+        <div class="modal-container" id="modalContainer">
+            <button class="modal-close" onclick="closeModal()">×</button>
+            <div id="modalContent">
+                <!-- El contenido se carga dinámicamente -->
+            </div>
+        </div>
+    </div>
+
+    
+   <!-- <script src="js/dashboard-aprendiz.js"></script> -->
+</body>
+</html>

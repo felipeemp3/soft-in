@@ -1,0 +1,5 @@
+/* Centra el título y el párrafo horizontalmente */
+h1 , p {
+    text-align: center;
+    margin-bottom: 100px;
+}

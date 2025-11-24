@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Permiso Formación</title>
+    <link rel="stylesheet" href="css/permiso-formacion-aprendiz.css">
+</head>
+<body>
+    <div class="form-container">
+        <div class="form-header">
+            <div class="header-title">
+                <div class="header-icon">📋</div>
+                Soft-In
+            </div>
+            <button class="close-button" onclick="goBack()" aria-label="Volver a la página anterior">×</button>
+        </div>
+        
+        <div class="form-body">
+            <h2 class="form-title">PERMISO FORMACIÓN</h2>
+            
+            <form id="permisoForm">
+                <div class="form-group">
+                    <label class="form-label" for="nombre">Nombre</label>
+                    <input 
+                        type="text" 
+                        id="nombre"
+                        name="nombre"
+                        class="form-input" 
+                        placeholder="Ingresa tu nombre completo"
+                        required
+                    >
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="programa">Programa</label>
+                    <input 
+                        type="text" 
+                        id="programa"
+                        name="programa"
+                        class="form-input" 
+                        placeholder="Nombre del programa de formación"
+                        required
+                    >
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="fecha">Fecha</label>
+                    <input 
+                        type="date" 
+                        id="fecha"
+                        name="fecha"
+                        class="form-input"
+                        required
+                    >
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="observacion">Observación</label>
+                    <textarea 
+                        id="observacion"
+                        name="observacion"
+                        class="form-textarea" 
+                        placeholder="Escribe aquí cualquier observación adicional..."
+                        rows="4"
+                    ></textarea>
+                </div>
+
+                <div class="button-group">
+                    <button type="button" class="btn btn-secondary" onclick="attachPDF()">
+                        Adjuntar PDF
+                    </button>
+                    <button type="submit" class="btn btn-primary">
+                        Enviar
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+    <script>
+        function goBack() {
+            // Navegar a la página anterior
+            window.history.back();
+        }
+
+        function attachPDF() {
+            // Crear un input file temporal para seleccionar PDF
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.accept = '.pdf';
+            input.onchange = function(e) {
+                const file = e.target.files[0];
+                if (file) {
+                    alert('Archivo seleccionado: ' + file.name);
+                    // Aquí puedes agregar la lógica para manejar el archivo PDF
+                }
+            };
+            input.click();
+        }
+
+        // Manejar el envío del formulario
+        document.getElementById('permisoForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const formData = new FormData(this);
+            const data = Object.fromEntries(formData);
+            
+            // Validar campos requeridos
+            if (!data.nombre || !data.programa || !data.fecha) {
+                alert('Por favor, completa todos los campos requeridos.');
+                return;
+            }
+            
+            // Simular envío del formulario
+            alert('Formulario enviado correctamente:\n' + 
+                  'Nombre: ' + data.nombre + '\n' +
+                  'Programa: ' + data.programa + '\n' +
+                  'Fecha: ' + data.fecha + '\n' +
+                  'Observación: ' + (data.observacion || 'Sin observaciones'));
+            
+            // Aquí puedes agregar la lógica para enviar los datos al servidor
+        });
+
+        // Permitir cerrar con la tecla Escape
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                goBack();
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Evaluación Médica - Soft-In</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <!-- Referencia al archivo CSS separado -->
+    <link rel="stylesheet" href="css/modal-evaluacion-medica.css">
+</head>
+<body>
+    <!-- Demo Button to Open Modal -->
+    <button class="demo-button" onclick="openEvaluationModal()">
+        <i class="fas fa-stethoscope"></i>
+        Abrir Evaluación Médica
+    </button>
+
+    <!-- Medical Evaluation Modal -->
+    <div class="modal-overlay" id="evaluationModal">
+        <div class="modal-container">
+            <button class="modal-close" onclick="closeEvaluationModal()">×</button>
+            
+            <div class="modal-header">
+                <h2 class="modal-title">Valoración Médica</h2>
+            </div>
+
+            <form id="evaluationForm">
+                <div class="form-field">
+                    <button type="button" class="field-button" onclick="toggleField('nombre')">
+                        <i class="fas fa-user"></i>
+                        Nombre
+                    </button>
+                    <input type="text" class="form-input" id="nombre" placeholder="Ingrese el nombre completo">
+                </div>
+
+                <div class="form-field">
+                    <button type="button" class="field-button" onclick="toggleField('apellido')">
+                        <i class="fas fa-user-tag"></i>
+                        Apellido
+                    </button>
+                    <input type="text" class="form-input" id="apellido" placeholder="Ingrese los apellidos">
+                </div>
+
+                <div class="form-field">
+                    <button type="button" class="field-button" onclick="toggleField('programa')">
+                        <i class="fas fa-graduation-cap"></i>
+                        Programa
+                    </button>
+                    <input type="text" class="form-input" id="programa" placeholder="Programa de formación">
+                </div>
+
+                <div class="form-field">
+                    <button type="button" class="field-button" onclick="toggleField('sintomas')">
+                        <i class="fas fa-thermometer-half"></i>
+                        Síntomas
+                    </button>
+                    <textarea class="form-textarea" id="sintomas" placeholder="Describa los síntomas presentados"></textarea>
+                </div>
+
+                <div class="form-field">
+                    <button type="button" class="field-button" onclick="toggleField('observacion')">
+                        <i class="fas fa-eye"></i>
+                        Observación
+                    </button>
+                    <textarea class="form-textarea" id="observacion" placeholder="Observaciones médicas"></textarea>
+                </div>
+
+                <div class="form-field">
+                    <button type="button" class="field-button" onclick="toggleField('recomendacion')">
+                        <i class="fas fa-clipboard-list"></i>
+                        Recomendación
+                    </button>
+                    <textarea class="form-textarea" id="recomendacion" placeholder="Recomendaciones médicas"></textarea>
+                </div>
+
+                <button type="submit" class="send-button">
+                    <i class="fas fa-paper-plane"></i>
+                    Enviar
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Success Modal -->
+    <div class="modal-overlay" id="successModal">
+        <div class="success-modal">
+            <button class="modal-close" onclick="closeSuccessModal()">×</button>
+            
+            <div class="success-logo">Soft-In</div>
+            
+            <div class="success-message">
+                La evaluación médica ha sido enviada correctamente. El reporte será procesado por el personal médico.
+            </div>
+            
+            <button class="accept-button" onclick="closeSuccessModal()">
+                <i class="fas fa-check"></i>
+                Aceptar
+            </button>
+        </div>
+    </div>
+
+    <!-- JavaScript separado -->
+    <script src="js/modal-evaluacion-medica.js"></script>
+</body>
+</html>
