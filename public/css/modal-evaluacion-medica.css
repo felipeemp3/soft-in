@@ -1,0 +1,302 @@
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+        background-color: #f0f0f0;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 100vh;
+        padding: 20px;
+      }
+
+      /* Modal Overlay */
+      .modal-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.5);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 1000;
+        opacity: 0;
+        visibility: hidden;
+        transition: all 0.3s ease;
+      }
+
+      .modal-overlay.active {
+        opacity: 1;
+        visibility: visible;
+      }
+
+      /* Modal Container */
+      .modal-container {
+        background: white;
+        border-radius: 20px;
+        padding: 30px;
+        max-width: 400px;
+        width: 90%;
+        position: relative;
+        transform: scale(0.9);
+        transition: transform 0.3s ease;
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+      }
+
+      .modal-overlay.active .modal-container {
+        transform: scale(1);
+      }
+
+      /* Close Button */
+      .modal-close {
+        position: absolute;
+        top: 15px;
+        right: 15px;
+        background: none;
+        border: none;
+        font-size: 20px;
+        cursor: pointer;
+        color: #666;
+        width: 30px;
+        height: 30px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+        transition: all 0.3s ease;
+      }
+
+      .modal-close:hover {
+        background: #f0f0f0;
+        color: #333;
+      }
+
+      /* Modal Header */
+      .modal-header {
+        text-align: center;
+        margin-bottom: 30px;
+      }
+
+      .modal-title {
+        font-size: 18px;
+        font-weight: 700;
+        color: #333;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        margin-bottom: 20px;
+      }
+
+      /* Form Fields */
+      .form-field {
+        margin-bottom: 20px;
+      }
+
+      .field-label {
+        display: block;
+        margin-bottom: 8px;
+        font-weight: 600;
+        color: #555;
+        font-size: 14px;
+      }
+
+      /* Select Field */
+      .select-wrapper {
+        position: relative;
+      }
+
+      .select-field {
+        width: 100%;
+        padding: 15px 20px;
+        background: white;
+        border: 2px solid #e0e0e0;
+        border-radius: 25px;
+        font-size: 14px;
+        color: #333;
+        cursor: pointer;
+        outline: none;
+        appearance: none;
+        -webkit-appearance: none;
+        -moz-appearance: none;
+        transition: all 0.3s ease;
+        font-family: inherit;
+      }
+
+      .select-field:focus {
+        border-color: #b19cd9;
+        box-shadow: 0 0 0 3px rgba(177, 156, 217, 0.1);
+      }
+
+      .select-wrapper::after {
+        content: "▼";
+        font-size: 12px;
+        color: #666;
+        position: absolute;
+        right: 20px;
+        top: 50%;
+        transform: translateY(-50%);
+        pointer-events: none;
+      }
+
+      /* Textarea Field */
+      .textarea-field {
+        width: 100%;
+        padding: 15px 20px;
+        background: white;
+        border: 2px solid #e0e0e0;
+        border-radius: 15px;
+        font-size: 14px;
+        color: #333;
+        outline: none;
+        transition: all 0.3s ease;
+        font-family: inherit;
+        min-height: 120px;
+        resize: vertical;
+      }
+
+      .textarea-field:focus {
+        border-color: #b19cd9;
+        box-shadow: 0 0 0 3px rgba(177, 156, 217, 0.1);
+      }
+
+      .textarea-field::placeholder {
+        color: #999;
+      }
+
+      /* Send Button */
+      .send-button {
+        width: 100%;
+        padding: 18px 20px;
+        background: linear-gradient(135deg, #8e44ad, #9b59b6);
+        border: none;
+        border-radius: 25px;
+        color: white;
+        font-size: 16px;
+        font-weight: 700;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        margin-top: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+      }
+
+      .send-button:hover {
+        background: linear-gradient(135deg, #7d3c98, #8e44ad);
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(142, 68, 173, 0.4);
+      }
+
+      .send-button:active {
+        transform: translateY(0);
+      }
+
+      /* Demo Button */
+      .demo-button {
+        padding: 15px 30px;
+        background: linear-gradient(135deg, #8e44ad, #9b59b6);
+        border: none;
+        border-radius: 15px;
+        color: white;
+        font-size: 16px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+      }
+
+      .demo-button:hover {
+        background: linear-gradient(135deg, #7d3c98, #8e44ad);
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(142, 68, 173, 0.4);
+      }
+
+      /* Success Modal */
+      .success-modal {
+        background: white;
+        border-radius: 20px;
+        padding: 40px 30px;
+        max-width: 350px;
+        width: 90%;
+        text-align: center;
+        position: relative;
+        transform: scale(0.9);
+        transition: transform 0.3s ease;
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+      }
+
+      .success-logo {
+        font-size: 24px;
+        font-weight: 700;
+        color: #333;
+        margin-bottom: 30px;
+        letter-spacing: -1px;
+      }
+
+      .success-message {
+        color: #666;
+        font-size: 14px;
+        margin-bottom: 30px;
+        line-height: 1.5;
+      }
+
+      .accept-button {
+        padding: 15px 40px;
+        background: linear-gradient(135deg, #8e44ad, #9b59b6);
+        border: none;
+        border-radius: 25px;
+        color: white;
+        font-size: 14px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        margin: 0 auto;
+      }
+
+      .accept-button:hover {
+        background: linear-gradient(135deg, #7d3c98, #8e44ad);
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(142, 68, 173, 0.3);
+      }
+
+      /* Responsive */
+      @media (max-width: 480px) {
+        .modal-container {
+          padding: 25px 20px;
+          margin: 10px;
+        }
+
+        .modal-title {
+          font-size: 16px;
+        }
+
+        .select-field,
+        .textarea-field {
+          padding: 12px 15px;
+          font-size: 13px;
+        }
+
+        .send-button {
+          padding: 15px 20px;
+          font-size: 14px;
+        }
+      }
