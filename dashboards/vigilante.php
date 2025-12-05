@@ -1,5 +1,7 @@
+
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -9,6 +11,33 @@
     <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 </head>
+<style>
+    .logout-btn {
+        background: #e63946;
+        color: #fff;
+        border: none;
+        padding: 12px 22px;
+        font-size: 15px;
+        border-radius: 10px;
+        cursor: pointer;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        transition: 0.25s;
+        box-shadow: 0 4px 12px rgba(230, 57, 70, 0.4);
+    }
+
+    .logout-btn:hover {
+        background: #c92c38;
+        transform: translateY(-2px);
+    }
+
+    .logout-btn:active {
+        transform: scale(0.96);
+    }
+</style>
+
 <body>
     <!-- Loading Overlay -->
     <div class="loading-overlay" id="loadingOverlay">
@@ -30,11 +59,8 @@
             VIGILANTE
         </div>
         <div class="header-right">
-            <div class="user-avatar" onclick="showUserMenu()">
-                <i class="fas fa-user-shield"></i>
-            </div>
-            <button class="menu-button" onclick="showMainMenu()">
-                <i class="fas fa-bars"></i>
+            <button class="logout-btn" onclick="logoutUser()">
+                <i class="fa-solid fa-right-from-bracket"></i> Cerrar sesión
             </button>
         </div>
     </header>
@@ -43,8 +69,7 @@
     <main class="main-content">
         <!-- Welcome Section -->
         <div class="welcome-section">
-            <h1 class="welcome-title">Hola "Vigilante"</h1>
-            <p class="welcome-subtitle">Sistema de Control de Acceso y Seguridad</p>
+            <h1 class="welcome-title">Sistema de Control de Acceso y Seguridad</h1>
         </div>
 
         <!-- Action Buttons -->
@@ -70,33 +95,8 @@
                     <div class="stat-label">Ingresos Hoy</div>
                 </div>
             </div>
-            <div class="stat-card">
-                <div class="stat-icon">
-                    <i class="fas fa-sign-out-alt"></i>
-                </div>
-                <div class="stat-info">
-                    <div class="stat-number">42</div>
-                    <div class="stat-label">Salidas Hoy</div>
-                </div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-icon">
-                    <i class="fas fa-users"></i>
-                </div>
-                <div class="stat-info">
-                    <div class="stat-number">5</div>
-                    <div class="stat-label">Personas Dentro</div>
-                </div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-icon">
-                    <i class="fas fa-exclamation-triangle"></i>
-                </div>
-                <div class="stat-info">
-                    <div class="stat-number">0</div>
-                    <div class="stat-label">Alertas</div>
-                </div>
-            </div>
+        </div>
+        </div>
         </div>
 
         <!-- QR Section -->
@@ -124,7 +124,7 @@
                     </div>
                 </div>
                 <div class="qr-instructions">
-                    <p style="margin-bottom: 20px; color: #7f8c8d;">📷 Posiciona el código QR frente a la cámara</p>
+                    <p style="margin-bottom: 20px; color: #7f8c8d;">Posiciona el código QR frente a la cámara</p>
                     <button onclick="iniciarEscaner()" class="action-btn primary">
                         <i class="fas fa-camera"></i> Iniciar Escáner
                     </button>
@@ -137,15 +137,6 @@
             <div class="section-header">
                 <h2><i class="fas fa-history"></i> Historial de Ingreso</h2>
                 <div style="display: flex; gap: 10px; align-items: center;">
-                    <button class="btn-action btn-edit" onclick="toggleFiltros()">
-                        <i class="fas fa-filter"></i> Filtros
-                    </button>
-                    <button class="btn-action btn-delete" onclick="generarPDF()">
-                        <i class="fas fa-file-pdf"></i> Generar PDF
-                    </button>
-                    <button class="btn-action btn-edit" onclick="imprimirHistorial()">
-                        <i class="fas fa-print"></i> Imprimir
-                    </button>
                     <button class="btn-action btn-edit" onclick="cerrarHistorial()">
                         <i class="fas fa-times"></i> Cerrar
                     </button>
@@ -240,7 +231,7 @@
     <div class="modal-overlay" id="userMenuModal">
         <div class="modal-container" style="max-width: 350px;">
             <button class="modal-close" onclick="closeUserMenu()">×</button>
-            
+
             <div class="modal-header">
                 <h2 class="modal-title">Nombre del Vigilante</h2>
                 <p class="modal-subtitle">VIGILANTE - Turno Diurno</p>
@@ -267,7 +258,7 @@
     <div class="modal-overlay" id="logoutModal">
         <div class="modal-container" style="max-width: 400px;">
             <button class="modal-close" onclick="cancelarCerrarSesion()">×</button>
-            
+
             <div class="modal-header">
                 <div style="text-align: center;">
                     <i class="fas fa-sign-out-alt" style="font-size: 48px; color: #e74c3c; margin-bottom: 15px;"></i>
@@ -297,7 +288,7 @@
     <div class="modal-overlay" id="person-modal">
         <div class="modal-container">
             <button class="modal-close" onclick="cerrarModalPersona()">×</button>
-            
+
             <div class="modal-header">
                 <h2 class="modal-title">Detalles del Registro</h2>
                 <p class="modal-subtitle">Información completa del acceso</p>
@@ -335,6 +326,188 @@
         </table>
     </div>
 
-<!-- <script src="js/dashboard-vigilante.js"></script> -->
+    <script>
+        // Funciones principales del dashboard
+        function mostrarLectorQR() {
+            console.log("Mostrando lector QR")
+            document.getElementById("qr-section").classList.remove("hidden")
+            document.getElementById("historial-section").classList.add("hidden")
+        }
+
+        function cerrarLectorQR() {
+            console.log("Cerrando lector QR")
+            document.getElementById("qr-section").classList.add("hidden")
+            if (qrCodeScanner) {
+                qrCodeScanner.clear()
+                qrCodeScanner = null
+            }
+            document.getElementById("qr-result").classList.add("hidden")
+        }
+
+        function mostrarHistorial() {
+            console.log("Mostrando historial")
+            document.getElementById("historial-section").classList.remove("hidden")
+            document.getElementById("qr-section").classList.add("hidden")
+            cargarRegistros()
+        }
+
+        function cerrarHistorial() {
+            console.log("Cerrando historial")
+            document.getElementById("historial-section").classList.add("hidden")
+        }
+
+        // Función para cerrar sesión
+        function logoutUser() {
+            window.location.href = '../src/logout.php';
+        }
+
+        // Funciones del lector QR
+        function iniciarEscaner() {
+            console.log("Iniciando escáner QR")
+            const qrReaderElement = document.getElementById("qr-reader")
+            qrReaderElement.innerHTML = ""
+
+            const config = {
+                fps: 10,
+                qrbox: {
+                    width: 250,
+                    height: 250
+                },
+                aspectRatio: 1.0,
+                disableFlip: false,
+            }
+
+            const Html5QrcodeScanner = window.Html5QrcodeScanner
+            qrCodeScanner = new Html5QrcodeScanner("qr-reader", config, false)
+
+            qrCodeScanner.render(
+                (decodedText, decodedResult) => {
+                    onScanSuccess(decodedText, decodedResult)
+                },
+                (error) => {
+                    console.warn(`Error de escaneo QR: ${error}`)
+                },
+            )
+
+            document.querySelector(".qr-instructions").style.display = "none"
+        }
+
+        function onScanSuccess(decodedText, decodedResult) {
+            console.log("QR escaneado exitosamente:", decodedText)
+            if (qrCodeScanner) {
+                qrCodeScanner.clear()
+            }
+
+            personaEscaneada = procesarCodigoQR(decodedText)
+
+            document.getElementById("qr-person-name").textContent = personaEscaneada.nombre
+            document.getElementById("qr-person-id").textContent = personaEscaneada.documento
+            document.getElementById("qr-person-role").textContent = personaEscaneada.rol
+            document.getElementById("qr-result").classList.remove("hidden")
+
+            showSuccessMessage("Código QR escaneado exitosamente")
+        }
+
+        function cargarRegistros() {
+    const loadingOverlay = document.getElementById('loadingOverlay');
+    const tbody = document.getElementById('records-tbody');
+    const noRecords = document.getElementById('no-records');
+    const recordsInfo = document.getElementById('records-info');
+    
+    loadingOverlay.style.display = 'flex';
+    
+    // Obtener parámetros de filtros
+    const search = document.getElementById('search-input').value || '';
+    const fechaInicio = document.getElementById('fecha-inicio').value || '';
+    const fechaFin = document.getElementById('fecha-fin').value || '';
+    const tipo = document.getElementById('tipo-select').value || '';
+    const rol = document.getElementById('rol-select').value || '';
+    
+    const url = `../src/vigilante_historial.php?search=${encodeURIComponent(search)}`;
+    
+    fetch(url)
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                if (data.registros.length === 0) {
+                    noRecords.classList.remove('hidden');
+                    tbody.innerHTML = '';
+                } else {
+                    noRecords.classList.add('hidden');
+                    tbody.innerHTML = data.registros.map(registro => {
+                        // Formatear fecha y hora
+                        const fecha = new Date(registro.fecha_escaneo);
+                        const fechaFormateada = fecha.toLocaleDateString('es-CO');
+                        const horaFormateada = fecha.toLocaleTimeString('es-CO', { hour: '2-digit', minute: '2-digit' });
+                        
+                        // Determinar tipo de registro
+                        let tipoRegistro = 'Ingreso';
+                        if (registro.tipo_ingreso === 'salida') {
+                            tipoRegistro = 'Salida';
+                        }
+                        
+                        // Determinar estado
+                        let estadoClass = 'status-completed';
+                        let estadoText = 'Completado';
+                        
+                        if (registro.estado === 'escaneado') {
+                            estadoClass = 'status-pending';
+                            estadoText = 'Pendiente';
+                        } else if (registro.estado === 'en_bienestar') {
+                            estadoClass = 'status-process';
+                            estadoText = 'En Bienestar';
+                        } else if (registro.estado === 'en_enfermeria') {
+                            estadoClass = 'status-attention';
+                            estadoText = 'En Enfermería';
+                        }
+                        
+                        return `
+                            <tr>
+                                <td>${fechaFormateada}</td>
+                                <td>${horaFormateada}</td>
+                                <td>${registro.nombres} ${registro.apellidos}</td>
+                                <td>${registro.documento}</td>
+                                <td>${registro.rol}</td>
+                                <td>${tipoRegistro}</td>
+                                <td><span class="${estadoClass}">${estadoText}</span></td>
+                                <td>
+                                    <button class="btn-action btn-view" onclick="verDetalles(${registro.id_ingreso})">
+                                        <i class="fas fa-eye"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                        `;
+                    }).join('');
+                }
+                
+                recordsInfo.textContent = `Mostrando ${data.registros.length} de ${data.total_registros} registros`;
+            } else {
+                console.error('Error al cargar los registros:', data.error);
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="8" style="text-align: center; color: #e74c3c; padding: 20px;">
+                            Error al cargar los registros: ${data.error}
+                        </td>
+                    </tr>
+                `;
+            }
+        })
+        .catch(error => {
+            console.error('Error en la solicitud:', error);
+            tbody.innerHTML = `
+                <tr>
+                    <td colspan="8" style="text-align: center; color: #e74c3c; padding: 20px;">
+                        Error de conexión. Por favor, intenta nuevamente.
+                    </td>
+                </tr>
+            `;
+        })
+        .finally(() => {
+            loadingOverlay.style.display = 'none';
+        });
+}
+    </script>
+
 </body>
+
 </html>

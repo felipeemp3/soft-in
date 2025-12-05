@@ -19,13 +19,13 @@ if (isset($_POST["btnEnviar"])) {
     $id_enfermera = "1";
 
     // Insertar en la tabla enfermera_valoracion
-    $sql = "INSERT INTO `enfermera_valoracion` (`id_enfermera`, `id_aprendiz`, `observaciones`, `fecha_creacion`, `fecha_actualizacion`) 
+    $sql = "INSERT INTO `enfermera_valoracion` (`id_enfermera`, `id_personas`, `observacion`, `fecha_creacion`, `fecha_actualizacion`) 
             VALUES ('$id_enfermera', '$id_personas', '$observacion', NOW(), NOW())";
 
     if (mysqli_query($conn, $sql)) {
         echo '<script>
                 alert("✅ Valoración médica guardada exitosamente");
-                window.location.href = "dashboard-enfermera.php";
+                window.location.href = "../dashboards/enfermera.php";
               </script>';
     } else {
         echo "Error: " . $sql . "<br>" . mysqli_error($conn);

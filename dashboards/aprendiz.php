@@ -327,7 +327,6 @@
                 window.location.href = '../src/logout.php';
             }
         
-
         // Función para cerrar menú de usuario
         function closeUserMenu() {
             if (window.currentUserMenu) {

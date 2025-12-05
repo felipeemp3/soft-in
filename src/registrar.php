@@ -32,7 +32,7 @@ if (isset($_POST["btnGuardar"])) {
         if (mysqli_query($conn, $sql)) {
             echo '<script>
                 alert("Registro exitoso");
-                window.location.href = "/soft-/dashboards/admin.php";
+                window.location.href = "../dashboards/admin.php";
             </script>';
         } else {
             echo "Error: " . $sql . "<br>" . mysqli_error($conn);
@@ -41,4 +41,4 @@ if (isset($_POST["btnGuardar"])) {
     
     mysqli_close($conn);
 }
-?>
+?>  

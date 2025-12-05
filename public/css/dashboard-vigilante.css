@@ -256,13 +256,14 @@ body {
 
 .stat-number {
   font-size: 28px;
-  font-weight: 700;
+  font-weight: 500;
   color: #2c3e50;
   margin-bottom: 5px;
 }
 
 .stat-label {
   font-size: 14px;
+  text-align: center;
   color: #7f8c8d;
   font-weight: 500;
 }

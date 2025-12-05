@@ -23,15 +23,15 @@ if (mysqli_num_rows($result) > 0) {
   $_SESSION['rol'] = $rol;
   $_SESSION['documento'] = $usuario;
 
-  if ($rol == "Aprendiz") {
+  if ($rol == "Aprendiz" || $rol == "aprendiz") {
     header("Location: ../dashboards/aprendiz.php");
-  } elseif ($rol == "Admin") {
+  } elseif ($rol == "Admin" || $rol == "admin") {
     header("Location: ../dashboards/admin.php");
-  } elseif ($rol == "Bienestar") {
+  } elseif ($rol == "Bienestar" || $rol == "bienestar") {
     header("Location: ../dashboards/bienestar.php");
-  } elseif ($rol == "Vigilante") {
+  } elseif ($rol == "Vigilante" || $rol == "vigilante") {
     header("Location: ../dashboards/vigilante.php");
-  } elseif ($rol == "Enfermera") {
+  } elseif ($rol == "Enfermera" || $rol == "enfermera") {
     header("Location: ../dashboards/enfermera.php");
   }
 } else {
