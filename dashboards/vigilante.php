@@ -385,7 +385,7 @@
                     onScanSuccess(decodedText, decodedResult)
                 },
                 (error) => {
-                    console.warn(`Error de escaneo QR: ${error}`)
+                   // console.warn(`Error de escaneo QR: ${error}`)
                 },
             )
 
