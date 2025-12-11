@@ -1,13 +1,30 @@
 <?php
 include 'conexion.php';
 
-if (isset($_GET["btnPermiso"])) {
+if (isset($_POST["btnPermiso"])) {
     // Entrada y sanitización básica
-    $nombre = isset($_GET["nombre"]) ? mysqli_real_escape_string($conn, $_GET["nombre"]) : '';
-    $id_persona = isset($_GET["id_personas"]) ? mysqli_real_escape_string($conn, $_GET["id_personas"]) : '';
-    $programa = isset($_GET["programa"]) ? mysqli_real_escape_string($conn, $_GET["programa"]) : '';
-    $fecha = isset($_GET["fecha"]) ? mysqli_real_escape_string($conn, $_GET["fecha"]) : '';
-    $observacion = isset($_GET["observacion"]) ? mysqli_real_escape_string($conn, $_GET["observacion"]) : '';
+    $nombre = isset($_POST["nombre"]) ? mysqli_real_escape_string($conn, $_POST["nombre"]) : '';
+    $id_persona = isset($_POST["id_persona"]) ? mysqli_real_escape_string($conn, $_POST["id_persona"]) : '';
+    $programa = isset($_POST["programa"]) ? mysqli_real_escape_string($conn, $_POST["programa"]) : '';
+    $fecha = isset($_POST["fecha"]) ? mysqli_real_escape_string($conn, $_POST["fecha"]) : '';
+    $observacion = isset($_POST["observacion"]) ? mysqli_real_escape_string($conn, $_POST["observacion"]) : '';
+    // $pdf = isset($_POST["pdf"]) ? mysqli_real_escape_string($conn, $_POST["pdf"]) : ''; // Esta línea la borras
+
+    // NUEVO: Procesar archivo PDF si se subió
+    $ruta_pdf = '';
+    if (isset($_FILES['archivo_pdf']) && $_FILES['archivo_pdf']['error'] == 0) {
+        $directorio = "../uploads/permisos/";
+        if (!file_exists($directorio)) {
+            mkdir($directorio, 0777, true);
+        }
+        
+        $nombre_unico = 'permiso_' . $id_persona . '_' . time() . '.pdf';
+        $ruta_completa = $directorio . $nombre_unico;
+        
+        if (move_uploaded_file($_FILES['archivo_pdf']['tmp_name'], $ruta_completa)) {
+            $ruta_pdf = $ruta_completa;
+        }
+    }
 
     // Validar campos obligatorios
     if (empty($id_persona) || empty($programa) || empty($fecha)) {
@@ -15,15 +32,22 @@ if (isset($_GET["btnPermiso"])) {
         exit;
     }
 
-    // Inserción: mapear correctamente los campos del formulario a las columnas de la BD
-    // fecha_solicitud recibe la fecha del input date
-    // motivo recibe la observacion
-    $sql = "INSERT INTO `permiso` (`id_personas`, `fecha_solicitud`, `motivo`, `fecha_creacion`, `fecha_actualizacion`) 
-            VALUES ('$id_persona', '$fecha', '$observacion', current_timestamp(), current_timestamp())";
+    // NUEVO: Inserción con PDF si existe
+    if (!empty($ruta_pdf)) {
+        $sql = "INSERT INTO permiso (id_persona, fecha_solicitud, observacion, pdf, estado, fecha_creacion, fecha_actualizacion) 
+                VALUES ('$id_persona', '$fecha', '$observacion', '$ruta_pdf', 'pendiente', current_timestamp(), current_timestamp())";
+    } else {
+        // Tu código original (sin PDF)
+        $sql = "INSERT INTO permiso (id_persona, fecha_solicitud, observacion, estado, fecha_creacion, fecha_actualizacion) 
+                VALUES ('$id_persona', '$fecha', '$observacion', 'pendiente', current_timestamp(), current_timestamp())";
+    }
     
     if (mysqli_query($conn, $sql)) {
-        // Redirigir de vuelta al formulario con indicador de éxito
-        header('Location: ../dashboards/permiso_form.php?success=1');
+        // Mostrar mensaje de éxito con JavaScript y redirigir
+        echo '<script>
+            alert("¡Permiso enviado exitosamente!");
+            window.location.href = "../dashboards/aprendiz.php";
+        </script>';
         exit;
     } else {
         echo "Error al crear registro: " . mysqli_error($conn);
@@ -33,5 +57,4 @@ if (isset($_GET["btnPermiso"])) {
 }
 
 mysqli_close($conn);
-
 ?>
