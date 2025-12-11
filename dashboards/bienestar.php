@@ -129,8 +129,7 @@
             <div class="section-header">
                 <h2><i class="fas fa-history"></i> Historial de Ingresos</h2>
                 <div style="display: flex; gap: 10px; align-items: center;">
-                    <button class="btn-action btn-edit" onclick="toggleFiltros()">
-                        <i class="fas fa-filter"></i> Filtros
+
                     </button>
                     <button class="btn-action btn-delete" onclick="descargarHistorialPDF()">
                         <i class="fas fa-file-pdf"></i> PDF
@@ -202,7 +201,7 @@
                             <th>Hora</th>
                             <th>Tipo Ingreso</th>
                             <th>Estado</th>
-                            <th>Acciones</th>
+                        
                         </tr>
                     </thead>
                     <tbody id="records-tbody">
@@ -438,5 +437,11 @@ document.addEventListener('DOMContentLoaded', function() {
     // Recargar el conteo cada 30 segundos para mantenerlo actualizado
     setInterval(cargarConteoIngresosHoy, 10000);
 });
+
+function descargarHistorialPDF() {
+    alert("Funcionalidad de descarga de PDF no implementada.")
+}
+
+
 </script>
 </html>
