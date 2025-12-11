@@ -13,12 +13,22 @@ body {
     margin: auto;
 }
 
-/* ===== HEADER ===== */
+/* ===== HEADER FLEX LAYOUT FIX (Corrección para el botón de cerrar sesión) ===== */
 .header {
     background: #6a0dad;
     color: white;
     padding: 40px 0;
-    text-align: center;
+    /* La alineación central se maneja ahora con Flexbox en .header-flex */
+}
+
+.header-flex {
+    display: flex;
+    justify-content: space-between; /* Mueve el contenido a los extremos */
+    align-items: center; /* Centra verticalmente */
+}
+
+.header-title {
+    text-align: left; /* Asegura la alineación del texto del título */
 }
 
 .header h1 {
@@ -29,6 +39,32 @@ body {
 .header p {
     margin: 5px 0 0;
     font-size: 18px;
+}
+
+/* ESTILOS DEL BOTÓN DE CERRAR SESIÓN */
+.logout-btn {
+    background: #e63946;
+    color: #fff;
+    border: none;
+    padding: 12px 22px;
+    font-size: 15px;
+    border-radius: 10px;
+    cursor: pointer;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: 0.25s;
+    box-shadow: 0 4px 12px rgba(230, 57, 70, 0.4);
+}
+
+.logout-btn:hover {
+    background: #c92c38;
+    transform: translateY(-2px);
+}
+
+.logout-btn:active {
+    transform: scale(0.96);
 }
 
 /* ===== CARDS ===== */
