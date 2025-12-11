@@ -1,9 +1,10 @@
 <?php include '../src/seguridad.php'; ?>
+<?php include('../src/conexion.php');?>
+
 
 <?php
 $id_persona = $_GET["id_persona"];
 
-include('../src/conexion.php');
 
 $sql = "SELECT * FROM personas WHERE id_persona = $id_persona";
 $result = mysqli_query($conn, $sql);
@@ -70,9 +71,9 @@ if (mysqli_num_rows($result) > 0) {
         </div>
         <div class="form-row">
             <div class="form-group">
-                <label for="tipoAprendiz">Tipo de Aprendiz</label>
-                <select id="tipoAprendiz" name="tip_aprendiz">
-                    <option value="">Seleccionar</option>
+                <label for="tipoAprendiz">Tipo de Aprendiz</label> 
+                <select id="tipoAprendiz" name="tip_aprendiz" required>
+                    <option value="<?php echo $tip_aprndiz; ?>">Seleccionar</option>
                     <option value="interno">Interno</option>
                     <option value="externo">Externo</option>
                 </select>
