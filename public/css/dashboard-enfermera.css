@@ -1,0 +1,212 @@
+/* ===== GENERAL ===== */
+body {
+    margin: 0;
+    padding: 0;
+    font-family: Arial, sans-serif;
+    background: #f5f2ff;
+    color: #333;
+}
+
+.container {
+    width: 90%;
+    max-width: 1200px;
+    margin: auto;
+}
+
+/* ===== HEADER ===== */
+.header {
+    background: #6a0dad;
+    color: white;
+    padding: 40px 0;
+    text-align: center;
+}
+
+.header h1 {
+    margin: 0;
+    font-size: 34px;
+}
+
+.header p {
+    margin: 5px 0 0;
+    font-size: 18px;
+}
+
+/* ===== CARDS ===== */
+.stats {
+    margin-top: 25px;
+    display: flex;
+    gap: 20px;
+}
+
+.stat-card {
+    flex: 1;
+    background: white;
+    padding: 20px;
+    border-radius: 10px;
+    text-align: center;
+    border-top: 5px solid #8e22ff;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.stat-number {
+    font-size: 28px;
+    font-weight: bold;
+    margin-top: 10px;
+}
+
+/* ===== TABLE ===== */
+.table-section {
+    margin-top: 40px;
+}
+
+.table-container {
+    overflow-x: auto;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    background: white;
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+th {
+    background: #8e22ff;
+    color: white;
+    padding: 12px;
+    text-align: left;
+}
+
+td {
+    padding: 12px;
+    border-bottom: 1px solid #ddd;
+}
+
+.badge.pending {
+    background: #c792fe;
+    padding: 5px 10px;
+    border-radius: 8px;
+    color: white;
+}
+
+/* VALORAR BUTTON */
+.btn-valorar {
+    background: #6a0dad;
+    color: white;
+    padding: 7px 15px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background 0.3s;
+}
+
+.btn-valorar:hover {
+    background: #540c8e;
+}
+
+/* ===== MODAL ===== */
+.modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.6);
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.modal.active {
+    display: flex;
+}
+
+.modal-content {
+    background: white;
+    width: 450px;
+    max-width: 90%;
+    padding: 25px;
+    border-radius: 10px;
+    position: relative;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
+}
+
+.modal-close {
+    position: absolute;
+    right: 15px;
+    top: 10px;
+    cursor: pointer;
+    font-size: 24px;
+    color: #666;
+}
+
+.modal-close:hover {
+    color: #333;
+}
+
+/* FORM */
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: bold;
+}
+
+.form-control {
+    text-align: left;
+    width: 99%;
+    padding: 8px 12px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    font-size: 14px;
+}
+
+.form-control:disabled {
+    background-color: #f5f5f5;
+    color: #666;
+}
+
+textarea.form-control {
+    resize: vertical;
+    min-height: 120px;
+}
+
+.form-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 15px;
+    margin-top: 20px;
+}
+
+.btn {
+    padding: 10px 20px;
+    border-radius: 6px;
+    cursor: pointer;
+    border: none;
+    font-size: 14px;
+    font-weight: bold;
+    transition: all 0.3s;
+}
+
+.btn-primary {
+    background: #6a0dad;
+    color: white;
+}
+
+.btn-primary:hover {
+    background: #520a87;
+}
+
+.btn-secondary {
+    background: #bbb;
+    color: #333;
+}
+
+.btn-secondary:hover {
+    background: #999;
+}
