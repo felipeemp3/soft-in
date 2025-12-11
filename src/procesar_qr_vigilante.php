@@ -1,94 +1,93 @@
 <?php
 session_start();
-include 'conexion.php';
+header('Content-Type: application/json');
+include 'conexion.php'; // Usamos tu archivo de conexión
 
-// Verificar que sea vigilante
-if (!isset($_SESSION['id_persona']) || $_SESSION['rol'] != 'vigilante') {
-    echo json_encode(['success' => false, 'error' => 'No autorizado']);
-    exit();
+// El token es lo que se extrae del escaneo (puede venir por GET o POST)
+if (!isset($_GET['token'])) {
+    echo json_encode(['success' => false, 'error' => 'Token de escaneo no proporcionado']);
+    exit;
 }
 
-$vigilante_id = $_SESSION['id_persona'];
-
-// Recibir datos
-$data = json_decode(file_get_contents('php://input'), true);
-$token = $data['token'] ?? '';
-$tipo = $data['tipo'] ?? 'ingreso';
-
-if (empty($token)) {
-    echo json_encode(['success' => false, 'error' => 'Token no proporcionado']);
-    exit();
-}
+$token = $_GET['token'];
+date_default_timezone_set('America/Bogota');
+$fecha_actual = date('Y-m-d H:i:s');
 
 try {
-    // Buscar el QR por token
-    $stmt = $conn->prepare("
-        SELECT 
-            cq.*,
-            p.id_persona as id_aprendiz
-        FROM codigos_qr cq
-        JOIN personas p ON cq.id_aprendiz = p.id_persona
-        WHERE cq.token = ? 
-        AND cq.estado = 'activo'
-        AND cq.fecha_expiracion > NOW()
-    ");
+    // 1. Buscar y obtener datos del QR y del Aprendiz (JOIN con la tabla 'personas')
+    $sql = "SELECT c.id_qr, c.id_aprendiz, c.fecha_expiracion, c.estado, 
+                   p.nombres, p.apellidos, p.documento, p.programa_formacion, p.no_ficha
+            FROM codigos_qr c
+            JOIN personas p ON c.id_aprendiz = p.id_persona
+            WHERE c.token = ? LIMIT 1";
+
+    $stmt = $conn->prepare($sql);
     $stmt->bind_param("s", $token);
     $stmt->execute();
-    $result = $stmt->get_result();
-    
-    if ($result->num_rows > 0) {
-        $qr_data = $result->fetch_assoc();
+    $resultado = $stmt->get_result();
+
+    if ($resultado->num_rows === 0) {
+        throw new Exception("El código QR no es válido o ya fue eliminado.");
+    }
+
+    $qrData = $resultado->fetch_assoc();
+
+    // 2. Validaciones de lógica
+    if ($qrData['estado'] !== 'activo') {
+        throw new Exception("El código QR ya fue usado o está inactivo. Estado: " . $qrData['estado']);
+    }
+
+    if ($fecha_actual > $qrData['fecha_expiracion']) {
+        // Opcional: Actualizar el estado a expirado en la BD
+        $conn->query("UPDATE codigos_qr SET estado = 'expirado' WHERE id_qr = " . $qrData['id_qr']);
+        throw new Exception("El código QR ha expirado. Generar uno nuevo.");
+    }
+
+    // 3. Registrar el Ingreso y Quemar el QR (Transacción para asegurar ambas operaciones)
+    $conn->begin_transaction();
+
+    try {
+        // A. Actualizar estado del QR a 'usado'
+        $updateQR = "UPDATE codigos_qr SET estado = 'usado', veces_usado = veces_usado + 1 WHERE id_qr = ?";
+        $stmtUpd = $conn->prepare($updateQR);
+        $stmtUpd->bind_param("i", $qrData['id_qr']);
+        $stmtUpd->execute();
+
+        // B. Insertar en 'registro_ingreso'
+        // Obtener ID del vigilante (Si no hay sesión, puedes usar un ID por defecto, como '1' de tu tabla)
+        $id_vigilante = 1; // ID por defecto de tu vigilante (Jesus David en tu DB)
+        if (isset($_SESSION['usuario_id']) && $_SESSION['rol'] == 'vigilante') {
+            $id_vigilante = $_SESSION['usuario_id'];
+        }
         
-        // 1. Marcar QR como usado
-        $update_stmt = $conn->prepare("
-            UPDATE codigos_qr 
-            SET estado = 'usado', 
-                veces_usado = veces_usado + 1 
-            WHERE id_qr = ?
-        ");
-        $update_stmt->bind_param("i", $qr_data['id_qr']);
-        $update_stmt->execute();
+        $insertIngreso = "INSERT INTO registro_ingreso (id_aprendiz, id_vigilante, fecha_escaneo, estado, tipo_ingreso, observaciones) 
+                          VALUES (?, ?, ?, 'escaneado', 'qr', 'Ingreso validado por QR')";
         
-        // 2. Registrar en registro_ingreso
-        $registro_stmt = $conn->prepare("
-            INSERT INTO registro_ingreso 
-            (id_aprendiz, id_vigilante, estado, tipo_ingreso)
-            VALUES (?, ?, 'completado', ?)
-        ");
-        $registro_stmt->bind_param("iis", $qr_data['id_aprendiz'], $vigilante_id, $tipo);
-        $registro_stmt->execute();
-        
-        $registro_id = $registro_stmt->insert_id;
-        
-        // 3. Registrar en historial_ingreso (¡CLAVE PARA EL CONTEO Y DASHBOARD DE BIENESTAR!)
-        $hist_ingreso_stmt = $conn->prepare("
-            INSERT INTO historial_ingreso 
-            (id_personas, fecha_ingreso, observacion)
-            VALUES (?, NOW(), ?)
-        ");
-        $obs_text = ($tipo == 'ingreso' ? 'Ingreso' : 'Salida') . " registrado mediante QR. Código: " . $qr_data['codigo_unico'];
-        // Usamos id_aprendiz, que es el id_persona
-        $hist_ingreso_stmt->bind_param("is", $qr_data['id_aprendiz'], $obs_text); 
-        $hist_ingreso_stmt->execute();
-        
+        $stmtIngreso = $conn->prepare($insertIngreso);
+        $stmtIngreso->bind_param("iis", $qrData['id_aprendiz'], $id_vigilante, $fecha_actual);
+        $stmtIngreso->execute();
+
+        // Confirmar transacción
+        $conn->commit();
+
+        // 4. Respuesta de éxito con datos del aprendiz
         echo json_encode([
             'success' => true,
-            'id_ingreso' => $registro_id,
-            'tipo_registrado' => $tipo,
-            'mensaje' => ($tipo == 'ingreso') ? '✅ Ingreso registrado exitosamente' : '🚪 Salida registrada exitosamente'
+            'mensaje' => 'ACCESO AUTORIZADO Y REGISTRADO',
+            'aprendiz' => [
+                'nombre' => $qrData['nombres'] . ' ' . $qrData['apellidos'],
+                'documento' => $qrData['documento'],
+                'programa' => $qrData['programa_formacion'],
+                'ficha' => $qrData['no_ficha']
+            ]
         ]);
-    } else {
-        echo json_encode([
-            'success' => false, 
-            'error' => 'Código QR no válido, expirado o ya utilizado'
-        ]);
-    }
-} catch (Exception $e) {
-    echo json_encode([
-        'success' => false, 
-        'error' => 'Error en el servidor: ' . $e->getMessage()
-    ]);
-}
 
-$conn->close();
+    } catch (Exception $e) {
+        $conn->rollback();
+        throw new Exception("Error al procesar el ingreso: " . $e->getMessage());
+    }
+
+} catch (Exception $e) {
+    echo json_encode(['success' => false, 'error' => 'Acceso Denegado. ' . $e->getMessage()]);
+}
 ?>
