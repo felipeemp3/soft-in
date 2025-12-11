@@ -1,40 +1,78 @@
 <?php
-
-include('conexion.php');
-
 session_start();
+require_once 'conexion.php';
 
-if (isset($_POST["login-button"]))
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['login-button'])) {
+    $documento = trim($_POST['documento'] ?? '');
+    $password = $_POST['password'] ?? '';
 
-  $usuario = $_POST["documento"];
-$password = $_POST["password"];
-$rol = "";
+    if (empty($documento) || empty($password)) {
+        header('Location: ../index.html?login=error');
+        exit();
+    }
 
-$sql = "SELECT * FROM personas WHERE documento = '$usuario'  AND password_hash = '$password'";
+    // Buscar usuario por documento
+    $query = "SELECT id_persona, documento, password_hash, nombres, apellidos, rol, programa_formacion, no_ficha 
+              FROM personas 
+              WHERE documento = ?";
+    $stmt = $conn->prepare($query);
+    $stmt->bind_param("s", $documento);
+    $stmt->execute();
+    $result = $stmt->get_result();
 
-$result = mysqli_query($conn, $sql);
+    if ($result->num_rows === 1) {
+        $user = $result->fetch_assoc();
 
-if (mysqli_num_rows($result) > 0) {
+        // Verificar contraseña (en tu BD está en texto plano como '123')
+        if ($password === $user['password_hash']) {
+            // Iniciar sesión
+            $_SESSION['usuario_id'] = $user['id_persona'];
+            $_SESSION['nombres'] = $user['nombres'];
+            $_SESSION['apellidos'] = $user['apellidos'];
+            $_SESSION['documento'] = $user['documento'];
+            $_SESSION['rol'] = $user['rol'];
+            $_SESSION['programa_formacion'] = $user['programa_formacion'];
+            $_SESSION['no_ficha'] = $user['no_ficha'];
+            $_SESSION['id_persona'] = $user['id_persona']; // Añadir esta línea
 
-  while ($row = mysqli_fetch_assoc($result)) {
-    $rol = $row["rol"];
-  }
+            // Redirigir según el rol
+            switch ($user['rol']) {
+                case 'aprendiz':
+                    header('Location: ../dashboards/aprendiz.php');
+                    exit();
 
-  $_SESSION['rol'] = $rol;
-  $_SESSION['documento'] = $usuario;
+                case 'vigilante':
+                    header('Location: ../dashboards/vigilante.php');
+                    exit();
 
-  if ($rol == "Aprendiz" || $rol == "aprendiz") {
-    header("Location: ../dashboards/aprendiz.php");
-  } elseif ($rol == "Admin" || $rol == "admin") {
-    header("Location: ../dashboards/admin.php");
-  } elseif ($rol == "Bienestar" || $rol == "bienestar") {
-    header("Location: ../dashboards/bienestar.php");
-  } elseif ($rol == "Vigilante" || $rol == "vigilante") {
-    header("Location: ../dashboards/vigilante.php");
-  } elseif ($rol == "Enfermera" || $rol == "enfermera") {
-    header("Location: ../dashboards/enfermera.php");
-  }
+                case 'bienestar':
+                    header('Location: ../dashboards/bienestar.php');
+                    exit();
+
+                case 'enfermera':
+                    header('Location: ../dashboards/enfermera.php');
+                    exit();  // ← AQUÍ ESTABA EL PROBLEMA
+
+                case 'admin':
+                    header('Location: ../dashboards/admin.php');
+                    exit();
+
+                default:
+                    header('Location: ../index.html?login=error');
+                    exit();
+            }
+        } else {
+            header('Location: ../index.html?login=error');
+            exit();
+        }
+    } else {
+        header('Location: ../index.html?login=error');
+        exit();
+    }
+
+    $stmt->close();
+    $conn->close();
 } else {
-  header("Location: ../dashboards/inicio-sesion.html?login=error");
-  exit();
+    header('Location: ../index.html');
+    exit();
 }
