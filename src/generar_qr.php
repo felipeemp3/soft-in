@@ -1,82 +1,51 @@
 <?php
 session_start();
-require_once 'conexion.php';
+header('Content-Type: application/json');
+include 'conexion.php'; // Usamos tu archivo de conexión
 
-// Verificar sesión
-if (!isset($_SESSION['usuario_id']) || $_SESSION['rol'] !== 'aprendiz') {
-    echo json_encode(['success' => false, 'error' => 'No autorizado']);
-    exit();
+
+if (!isset($_SESSION['usuario_id'])) {
+    echo json_encode(['success' => false, 'error' => 'No hay una sesión de aprendiz activa.']);
+    exit;
 }
 
-// Obtener datos del aprendiz
 $id_aprendiz = $_SESSION['usuario_id'];
-$nombres = $_SESSION['nombres'] ?? '';
-$apellidos = $_SESSION['apellidos'] ?? '';
-$documento = $_SESSION['documento'] ?? '';
-
-// Generar un token único
-$token = bin2hex(random_bytes(16));
-$codigo_qr = 'QR-' . date('YmdHis') . '-' . strtoupper(substr(md5(uniqid()), 0, 8));
-
-// Fechas
-$fecha_generacion = date('Y-m-d H:i:s');
-$fecha_expiracion = date('Y-m-d H:i:s', strtotime('+30 minutes'));
 
 try {
-    // Guardar en la tabla codigos_qr
-    $sql = "INSERT INTO codigos_qr (codigo_unico, id_aprendiz, token, fecha_generacion, fecha_expiracion, estado) 
-            VALUES (?, ?, ?, ?, ?, 'activo')";
+    // 1. Generar Token y Código Único
+    $token = bin2hex(random_bytes(16)); // Token de 32 caracteres (ej: 6f9e38364456...)
+    $codigo_unico = 'QR-' . date('YmdHis') . '-' . strtoupper(substr($token, 0, 8));
     
+    // Fechas (Ajusta la zona horaria si es necesario)
+    date_default_timezone_set('America/Bogota');
+    $fecha_generacion = date('Y-m-d H:i:s');
+    // El QR solo será válido por 30 minutos (configurable)
+    $fecha_expiracion = date('Y-m-d H:i:s', strtotime('+30 minutes')); 
+
+    // 2. Insertar en la tabla 'codigos_qr'
+    $sql = "INSERT INTO codigos_qr (codigo_unico, id_aprendiz, token, fecha_generacion, fecha_expiracion, estado, veces_usado) 
+            VALUES (?, ?, ?, ?, ?, 'activo', 0)";
+            
     $stmt = $conn->prepare($sql);
-    
-    if (!$stmt) {
-        throw new Exception("Error preparando consulta: " . $conn->error);
-    }
-    
-    $stmt->bind_param("sisss", 
-        $codigo_qr,
-        $id_aprendiz,
-        $token,
-        $fecha_generacion,
-        $fecha_expiracion
-    );
+    $stmt->bind_param("sisss", $codigo_unico, $id_aprendiz, $token, $fecha_generacion, $fecha_expiracion);
     
     if ($stmt->execute()) {
-        // Construir URL correcta
-        $protocol = isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? "https" : "http";
-        $host = $_SERVER['HTTP_HOST'];
-        $base_path = dirname(dirname($_SERVER['SCRIPT_NAME']));
-        $qr_url = "$protocol://$host$base_path/src/procesar_qr_vigilante.php?token=" . $token;
         
-        // Para desarrollo local, usar URL relativa
-        $qr_url_alternativa = "../src/procesar_qr_vigilante.php?token=" . $token;
+        // Asumiendo que guardaste los nombres en sesión al iniciar, o se podrían consultar
+        $nombres = $_SESSION['nombres'] ?? 'Aprendiz ID: ' . $id_aprendiz;
         
         echo json_encode([
             'success' => true,
-            'mensaje' => 'Código QR generado exitosamente',
-            'codigo_qr' => $codigo_qr,
-            'token' => $token,
-            'aprendiz' => $nombres . ' ' . $apellidos,
-            'documento' => $documento,
-            'fecha_generado' => $fecha_generacion,
+            'token' => $token, // Este es el dato que se codifica en la imagen QR
+            'codigo_qr' => $codigo_unico,
             'fecha_expiracion' => $fecha_expiracion,
-            'qr_url' => $qr_url,
-            'qr_url_relativa' => $qr_url_alternativa,
-            'debug' => [
-                'host' => $host,
-                'base_path' => $base_path,
-                'protocol' => $protocol
-            ]
+            'aprendiz' => $nombres
         ]);
     } else {
-        echo json_encode(['success' => false, 'error' => 'Error al guardar en la base de datos: ' . $conn->error]);
+        throw new Exception("Error al insertar el QR en la base de datos.");
     }
-    
-    $stmt->close();
-    
-} catch (Exception $e) {
-    echo json_encode(['success' => false, 'error' => 'Error: ' . $e->getMessage()]);
-}
 
-$conn->close();
+} catch (Exception $e) {
+    echo json_encode(['success' => false, 'error' => $e->getMessage()]);
+}
 ?>
