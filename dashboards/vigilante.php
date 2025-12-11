@@ -827,8 +827,7 @@ $conn->close();
 
         // ===================== FUNCIONES LOGOUT =====================
 
-        function logoutUser() {
-            if (confirm("¿Estás seguro de que deseas cerrar sesión?")) {
+        function logoutUser() { {
                 window.location.href = '../src/logout.php';
             }
         }
@@ -837,11 +836,7 @@ $conn->close();
             document.getElementById('logoutModal').classList.add('hidden');
         }
 
-        function cerrarSesion() {
-            window.location.href = '../src/logout.php';
-        }
 
-        // ===================== FUNCIONES MODALES =====================
 
         function cerrarModalPersona() {
             document.getElementById('person-modal').classList.add('hidden');
