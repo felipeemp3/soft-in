@@ -1,5 +1,4 @@
 <?php
-
 include('conexion.php');
 $sql = "SELECT * FROM personas";
 $result = mysqli_query($conn, $sql);
