@@ -1,3 +1,21 @@
+<?php include('../src/seguridad.php');
+if ($_SESSION['rol'] !== 'vigilante') {
+    header("Location: ../index.php");
+    exit();
+}
+include('../src/conexion.php');
+// Obtener estadísticas de ingresos hoy
+$ingresos_hoy = 0;
+$sql_ingresos_hoy = "SELECT COUNT(*) as total FROM vigilante_leer_qr WHERE DATE (fecha_lectura) = CURDATE()";
+$result_ingresos_hoy = mysqli_query($conn, $sql_ingresos_hoy);
+if ($result_ingresos_hoy) {
+    $row = mysqli_fetch_assoc($result_ingresos_hoy);
+    $ingresos_hoy = $row['total'];
+}
+$conn->close();
+
+?>
+
 
 <!DOCTYPE html>
 <html lang="es">
@@ -35,6 +53,146 @@
 
     .logout-btn:active {
         transform: scale(0.96);
+    }
+
+    /* Estilos para el modal de éxito */
+    .success-modal {
+        background: white;
+        padding: 40px;
+        border-radius: 15px;
+        text-align: center;
+        max-width: 400px;
+        width: 90%;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        animation: modalSlideIn 0.3s ease-out;
+    }
+
+    .success-icon {
+        font-size: 60px;
+        color: #4CAF50;
+        margin-bottom: 20px;
+        animation: successBounce 0.5s ease-out;
+    }
+
+    .success-title {
+        color: #2c3e50;
+        margin-bottom: 10px;
+        font-size: 24px;
+    }
+
+    .success-message {
+        color: #7f8c8d;
+        margin-bottom: 25px;
+        font-size: 16px;
+        line-height: 1.5;
+    }
+
+    .btn-accept {
+        background: #4CAF50;
+        color: white;
+        border: none;
+        padding: 12px 30px;
+        border-radius: 8px;
+        font-size: 16px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: 0.3s;
+        width: 100%;
+    }
+
+    .btn-accept:hover {
+        background: #388E3C;
+        transform: translateY(-2px);
+    }
+
+    @keyframes successBounce {
+        0% {
+            transform: scale(0.5);
+            opacity: 0;
+        }
+
+        50% {
+            transform: scale(1.1);
+        }
+
+        100% {
+            transform: scale(1);
+            opacity: 1;
+        }
+    }
+
+    @keyframes modalSlideIn {
+        from {
+            transform: translateY(-50px);
+            opacity: 0;
+        }
+
+        to {
+            transform: translateY(0);
+            opacity: 1;
+        }
+    }
+
+    /* Estilos para los estados en la tabla */
+    .status-completed {
+        background: #d4edda;
+        color: #155724;
+        padding: 4px 10px;
+        border-radius: 12px;
+        font-size: 12px;
+        font-weight: 600;
+    }
+
+    .status-pending {
+        background: #fff3cd;
+        color: #856404;
+        padding: 4px 10px;
+        border-radius: 12px;
+        font-size: 12px;
+        font-weight: 600;
+    }
+
+    .status-process {
+        background: #cce5ff;
+        color: #004085;
+        padding: 4px 10px;
+        border-radius: 12px;
+        font-size: 12px;
+        font-weight: 600;
+    }
+
+    .status-attention {
+        background: #f8d7da;
+        color: #721c24;
+        padding: 4px 10px;
+        border-radius: 12px;
+        font-size: 12px;
+        font-weight: 600;
+    }
+
+    .hidden {
+        display: none !important;
+    }
+
+    /* Estilos para el lector QR */
+    #qr-reader {
+        width: 100%;
+        max-width: 500px;
+        margin: 0 auto;
+    }
+
+    #qr-reader__dashboard_section_csr {
+        background: white;
+        border-radius: 10px;
+        padding: 20px;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    }
+
+    .qr-instructions {
+        margin-top: 30px;
+        padding: 20px;
+        background: #f8f9fa;
+        border-radius: 10px;
     }
 </style>
 
@@ -91,12 +249,12 @@
                     <i class="fas fa-sign-in-alt"></i>
                 </div>
                 <div class="stat-info">
-                    <div class="stat-number">47</div>
-                    <div class="stat-label">Ingresos Hoy</div>
+                    <div class="stat-number" id="ingresosHoy">0</div>
+                    <div class="stat-label">Ingresos Hoy
+                        <?php $ingresos_hoy; ?>
+                    </div>
                 </div>
             </div>
-        </div>
-        </div>
         </div>
 
         <!-- QR Section -->
@@ -111,16 +269,7 @@
                 <div id="qr-reader" style="max-width: 500px; margin: 0 auto 20px;"></div>
                 <div id="qr-result" class="hidden" style="background: #e8f5e8; padding: 20px; border-radius: 10px; margin: 20px 0;">
                     <h4 style="color: #27ae60; margin-bottom: 10px;">✅ Código Escaneado</h4>
-                    <p><strong>Persona:</strong> <span id="qr-person-name"></span></p>
-                    <p><strong>Documento:</strong> <span id="qr-person-id"></span></p>
-                    <p><strong>Rol:</strong> <span id="qr-person-role"></span></p>
-                    <div style="margin-top: 20px; display: flex; gap: 10px; justify-content: center;">
-                        <button onclick="registrarIngreso()" class="btn-submit" style="background: #27ae60;">
-                            <i class="fas fa-sign-in-alt"></i> Registrar Ingreso
-                        </button>
-                        <button onclick="registrarSalida()" class="btn-submit" style="background: #e74c3c;">
-                            <i class="fas fa-sign-out-alt"></i> Registrar Salida
-                        </button>
+                    
                     </div>
                 </div>
                 <div class="qr-instructions">
@@ -150,47 +299,6 @@
                     <input type="text" placeholder="Buscar por nombre, documento, rol..." id="search-input">
                     <button onclick="buscarRegistros()" class="btn-submit" style="margin-left: 10px; padding: 10px 20px;">
                         Buscar
-                    </button>
-                </div>
-            </div>
-
-            <!-- Filters Panel -->
-            <div id="filtros-panel" class="hidden" style="background: #f8f9fa; margin: 0 30px 20px; padding: 20px; border-radius: 10px; border: 1px solid #e9ecef;">
-                <h4 style="margin-bottom: 15px; color: #2c3e50;">📅 Filtrar Registros</h4>
-                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 15px;">
-                    <div>
-                        <label style="display: block; margin-bottom: 5px; font-weight: 600;">Fecha Inicio:</label>
-                        <input type="date" id="fecha-inicio" style="width: 100%; padding: 10px; border: 2px solid #e9ecef; border-radius: 8px;">
-                    </div>
-                    <div>
-                        <label style="display: block; margin-bottom: 5px; font-weight: 600;">Fecha Fin:</label>
-                        <input type="date" id="fecha-fin" style="width: 100%; padding: 10px; border: 2px solid #e9ecef; border-radius: 8px;">
-                    </div>
-                    <div>
-                        <label style="display: block; margin-bottom: 5px; font-weight: 600;">Tipo:</label>
-                        <select id="tipo-select" style="width: 100%; padding: 10px; border: 2px solid #e9ecef; border-radius: 8px;">
-                            <option value="">Todos los tipos</option>
-                            <option value="Ingreso">Ingreso</option>
-                            <option value="Salida">Salida</option>
-                        </select>
-                    </div>
-                    <div>
-                        <label style="display: block; margin-bottom: 5px; font-weight: 600;">Rol:</label>
-                        <select id="rol-select" style="width: 100%; padding: 10px; border: 2px solid #e9ecef; border-radius: 8px;">
-                            <option value="">Todos los roles</option>
-                            <option value="Estudiante">Estudiante</option>
-                            <option value="Docente">Docente</option>
-                            <option value="Administrativo">Administrativo</option>
-                            <option value="Visitante">Visitante</option>
-                        </select>
-                    </div>
-                </div>
-                <div style="display: flex; gap: 10px;">
-                    <button onclick="aplicarFiltros()" class="btn-submit">
-                        <i class="fas fa-check"></i> Aplicar
-                    </button>
-                    <button onclick="limpiarFiltros()" class="btn-cancel">
-                        <i class="fas fa-times"></i> Limpiar
                     </button>
                 </div>
             </div>
@@ -226,33 +334,6 @@
             </div>
         </div>
     </main>
-
-    <!-- User Menu Modal -->
-    <div class="modal-overlay" id="userMenuModal">
-        <div class="modal-container" style="max-width: 350px;">
-            <button class="modal-close" onclick="closeUserMenu()">×</button>
-
-            <div class="modal-header">
-                <h2 class="modal-title">Nombre del Vigilante</h2>
-                <p class="modal-subtitle">VIGILANTE - Turno Diurno</p>
-            </div>
-
-            <div style="display: flex; flex-direction: column; gap: 10px;">
-                <button class="action-btn primary" onclick="abrirPerfil()" style="justify-content: flex-start; padding: 15px 20px;">
-                    <i class="fas fa-user"></i>
-                    Mi Perfil
-                </button>
-                <button class="action-btn secondary" onclick="abrirConfiguracion()" style="justify-content: flex-start; padding: 15px 20px;">
-                    <i class="fas fa-cog"></i>
-                    Configuración
-                </button>
-                <button class="action-btn" onclick="confirmarCerrarSesion()" style="background: linear-gradient(135deg, #e74c3c, #c0392b); color: white; justify-content: flex-start; padding: 15px 20px; box-shadow: 0 5px 15px rgba(231, 76, 60, 0.3);">
-                    <i class="fas fa-sign-out-alt"></i>
-                    Cerrar Sesión
-                </button>
-            </div>
-        </div>
-    </div>
 
     <!-- Logout Confirmation Modal -->
     <div class="modal-overlay" id="logoutModal">
@@ -301,7 +382,7 @@
     </div>
 
     <!-- Success Modal -->
-    <div class="modal-overlay" id="successModal">
+    <div class="modal-overlay hidden" id="successModal">
         <div class="success-modal">
             <div class="success-icon">
                 <i class="fas fa-check-circle"></i>
@@ -314,59 +395,68 @@
         </div>
     </div>
 
-    <!-- Print Area (Hidden) -->
-    <div id="print-area" style="display: none;">
-        <div class="print-header">
-            <h1>SOFT-IN - Historial de Acceso</h1>
-            <p>Reporte generado el: <span id="print-date"></span></p>
-            <p>Vigilante: <span id="print-guard"></span></p>
-        </div>
-        <table class="print-table" id="print-table">
-            <!-- Se llena dinámicamente -->
-        </table>
-    </div>
-
     <script>
-        // Funciones principales del dashboard
+        // Variables globales
+        let qrCodeScanner = null;
+        let tokenActual = null;
+        let qrDataCache = null;
+
+        // Cargar estadísticas al iniciar
+        document.addEventListener('DOMContentLoaded', function() {
+            cargarEstadisticas();
+        });
+
+        // ===================== FUNCIONES PRINCIPALES =====================
+
         function mostrarLectorQR() {
-            console.log("Mostrando lector QR")
-            document.getElementById("qr-section").classList.remove("hidden")
-            document.getElementById("historial-section").classList.add("hidden")
+            console.log("Mostrando lector QR");
+            document.getElementById("qr-section").classList.remove("hidden");
+            document.getElementById("historial-section").classList.add("hidden");
+
+            // Iniciar escáner automáticamente
+            setTimeout(() => {
+                iniciarEscaner();
+            }, 500);
         }
 
         function cerrarLectorQR() {
-            console.log("Cerrando lector QR")
-            document.getElementById("qr-section").classList.add("hidden")
+            console.log("Cerrando lector QR");
+            document.getElementById("qr-section").classList.add("hidden");
             if (qrCodeScanner) {
-                qrCodeScanner.clear()
-                qrCodeScanner = null
+                qrCodeScanner.clear();
+                qrCodeScanner = null;
             }
-            document.getElementById("qr-result").classList.add("hidden")
+            document.getElementById("qr-result").classList.add("hidden");
+            document.querySelector('.qr-instructions').style.display = 'block';
         }
 
         function mostrarHistorial() {
-            console.log("Mostrando historial")
-            document.getElementById("historial-section").classList.remove("hidden")
-            document.getElementById("qr-section").classList.add("hidden")
-            cargarRegistros()
+            console.log("Mostrando historial");
+            document.getElementById("historial-section").classList.remove("hidden");
+            document.getElementById("qr-section").classList.add("hidden");
+            cargarRegistros();
         }
 
         function cerrarHistorial() {
-            console.log("Cerrando historial")
-            document.getElementById("historial-section").classList.add("hidden")
+            console.log("Cerrando historial");
+            document.getElementById("historial-section").classList.add("hidden");
         }
 
-        // Función para cerrar sesión
-        function logoutUser() {
-            window.location.href = '../src/logout.php';
-        }
+        // ===================== FUNCIONES QR ESCÁNER =====================
 
-        // Funciones del lector QR
         function iniciarEscaner() {
-            console.log("Iniciando escáner QR")
-            const qrReaderElement = document.getElementById("qr-reader")
-            qrReaderElement.innerHTML = ""
+            console.log("Iniciando escáner QR");
+            const qrReaderElement = document.getElementById("qr-reader");
+        
 
+            // Limpiar contenido previo
+            qrReaderElement.innerHTML = "";
+
+            // Ocultar instrucciones y resultados previos
+            document.querySelector('.qr-instructions').style.display = 'none';
+            document.getElementById("qr-result").classList.add("hidden");
+
+            // Configuración del escáner
             const config = {
                 fps: 10,
                 qrbox: {
@@ -375,137 +465,399 @@
                 },
                 aspectRatio: 1.0,
                 disableFlip: false,
-            }
+            };
 
-            const Html5QrcodeScanner = window.Html5QrcodeScanner
-            qrCodeScanner = new Html5QrcodeScanner("qr-reader", config, false)
+            // Crear instancia del escáner
+            const Html5QrcodeScanner = window.Html5QrcodeScanner;
+            qrCodeScanner = new Html5QrcodeScanner("qr-reader", config, false);
 
             qrCodeScanner.render(
                 (decodedText, decodedResult) => {
-                    onScanSuccess(decodedText, decodedResult)
+                    console.log("QR escaneado:", decodedText);
+
+                    // Detener el escáner cuando se detecta un código
+                    if (qrCodeScanner) {
+                        qrCodeScanner.clear();
+                        qrCodeScanner = null;
+                    }
+
+                    // Procesar el código escaneado
+                    procesarCodigoQR(decodedText);
                 },
                 (error) => {
-                   // console.warn(`Error de escaneo QR: ${error}`)
-                },
-            )
-
-            document.querySelector(".qr-instructions").style.display = "none"
+                    // Solo mostrar errores importantes en consola
+                    console.warn(`Error de escaneo: ${error}`);
+                }
+            );
         }
 
-        function onScanSuccess(decodedText, decodedResult) {
-            console.log("QR escaneado exitosamente:", decodedText)
-            if (qrCodeScanner) {
-                qrCodeScanner.clear()
+        function procesarCodigoQR(codigoEscaneado) {
+            console.log("Procesando código QR:", codigoEscaneado);
+
+            // Mostrar loading
+            document.getElementById('loadingOverlay').style.display = 'flex';
+
+            // Extraer token de la URL
+            let token = extraerTokenDeURL(codigoEscaneado);
+
+            if (!token) {
+                // Si no es una URL, usar el código directamente como token
+                token = codigoEscaneado;
             }
 
-            personaEscaneada = procesarCodigoQR(decodedText)
+            console.log("Token extraído:", token);
+            tokenActual = token;
 
-            document.getElementById("qr-person-name").textContent = personaEscaneada.nombre
-            document.getElementById("qr-person-id").textContent = personaEscaneada.documento
-            document.getElementById("qr-person-role").textContent = personaEscaneada.rol
-            document.getElementById("qr-result").classList.remove("hidden")
+            // Enviar el token al servidor para validar
+            fetch(`../src/procesar_qr_vigilante.php?token=${encodeURIComponent(token)}&tipo=validar`)
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('loadingOverlay').style.display = 'none';
 
-            showSuccessMessage("Código QR escaneado exitosamente")
+                    if (data.success) {
+                        // Guardar datos en caché
+                        qrDataCache = data;
+
+                        // Mostrar sección de resultados
+                        document.getElementById('qr-result').classList.remove('hidden');
+
+                        // Mostrar mensaje de éxito
+                        mostrarMensajeExito("✅ Código QR válido detectado");
+                    } else {
+                        // Mostrar mensaje de error
+                        mostrarMensajeError("❌ " + data.error);
+
+                        // Reiniciar escáner después de 2 segundos
+                        setTimeout(() => {
+                            iniciarEscaner();
+                        }, 2000);
+                    }
+                })
+                .catch(error => {
+                    document.getElementById('loadingOverlay').style.display = 'none';
+                    console.error('Error:', error);
+                    mostrarMensajeError("❌ Error de conexión: " + error.message);
+
+                    // Reiniciar escáner después de 2 segundos
+                    setTimeout(() => {
+                        iniciarEscaner();
+                    }, 2000);
+                });
+        }
+
+        function extraerTokenDeURL(codigo) {
+            try {
+                // Si es una URL completa
+                if (codigo.includes('procesar_qr_vigilante.php') && codigo.includes('token=')) {
+                    const urlParams = new URLSearchParams(codigo.split('?')[1]);
+                    return urlParams.get('token');
+                }
+
+                // Si es solo el token (formato: token=abc123)
+                if (codigo.includes('token=')) {
+                    const match = codigo.match(/token=([^&]+)/);
+                    return match ? match[1] : null;
+                }
+
+                // Si parece ser solo el token (formato hexadecimal)
+                if (/^[a-f0-9]{32}$/i.test(codigo)) {
+                    return codigo;
+                }
+
+                return null;
+            } catch (e) {
+                console.log("No es una URL válida, usando código directamente");
+                return codigo;
+            }
+        }
+
+        function registrarIngreso() {
+            if (!tokenActual) {
+                mostrarMensajeError("No hay un token válido para registrar");
+                return;
+            }
+
+            console.log("Registrando ingreso con token:", tokenActual);
+            document.getElementById('loadingOverlay').style.display = 'flex';
+
+            fetch(`../src/procesar_qr_vigilante.php?token=${encodeURIComponent(tokenActual)}&tipo=ingreso`)
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('loadingOverlay').style.display = 'none';
+
+                    if (data.success) {
+                        // Mostrar mensaje de éxito
+                        mostrarMensajeExito(data.mensaje);
+
+                        // Actualizar estadísticas
+                        actualizarEstadisticas();
+
+                        // Ocultar resultados después de 3 segundos
+                        setTimeout(() => {
+                            document.getElementById('qr-result').classList.add('hidden');
+
+                            // Reiniciar escáner
+                            iniciarEscaner();
+
+                            // Mostrar instrucciones nuevamente
+                            document.querySelector('.qr-instructions').style.display = 'block';
+                        }, 3000);
+                    } else {
+                        mostrarMensajeError("❌ Error al registrar ingreso: " + data.error);
+
+                        // Reiniciar escáner después de 2 segundos
+                        setTimeout(() => {
+                            iniciarEscaner();
+                        }, 2000);
+                    }
+                })
+                .catch(error => {
+                    document.getElementById('loadingOverlay').style.display = 'none';
+                    console.error('Error:', error);
+                    mostrarMensajeError("❌ Error de conexión: " + error.message);
+
+                    // Reiniciar escáner después de 2 segundos
+                    setTimeout(() => {
+                        iniciarEscaner();
+                    }, 2000);
+                });
+        }
+
+        function registrarSalida() {
+            if (!tokenActual) {
+                mostrarMensajeError("No hay un token válido para registrar");
+                return;
+            }
+
+            console.log("Registrando salida con token:", tokenActual);
+            document.getElementById('loadingOverlay').style.display = 'flex';
+
+            fetch(`../src/procesar_qr_vigilante.php?token=${encodeURIComponent(tokenActual)}&tipo=salida`)
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('loadingOverlay').style.display = 'none';
+
+                    if (data.success) {
+                        // Mostrar mensaje de éxito
+                        mostrarMensajeExito(data.mensaje);
+
+                        // Actualizar estadísticas
+                        actualizarEstadisticas();
+
+                        // Ocultar resultados después de 3 segundos
+                        setTimeout(() => {
+                            document.getElementById('qr-result').classList.add('hidden');
+
+                            // Reiniciar escáner
+                            iniciarEscaner();
+
+                            // Mostrar instrucciones nuevamente
+                            document.querySelector('.qr-instructions').style.display = 'block';
+                        }, 3000);
+                    } else {
+                        mostrarMensajeError("❌ Error al registrar salida: " + data.error);
+
+                        // Reiniciar escáner después de 2 segundos
+                        setTimeout(() => {
+                            iniciarEscaner();
+                        }, 2000);
+                    }
+                })
+                .catch(error => {
+                    document.getElementById('loadingOverlay').style.display = 'none';
+                    console.error('Error:', error);
+                    mostrarMensajeError("❌ Error de conexión: " + error.message);
+
+                    // Reiniciar escáner después de 2 segundos
+                    setTimeout(() => {
+                        iniciarEscaner();
+                    }, 2000);
+                });
+        }
+
+        // ===================== FUNCIONES AUXILIARES =====================
+
+        function mostrarMensajeExito(mensaje) {
+            const successModal = document.getElementById('successModal');
+            const successMessage = document.getElementById('successMessage');
+
+            successMessage.textContent = mensaje;
+            successModal.classList.remove('hidden');
+
+            // Ocultar automáticamente después de 3 segundos
+            setTimeout(() => {
+                successModal.classList.add('hidden');
+            }, 3000);
+        }
+
+        function mostrarMensajeError(mensaje) {
+            alert(mensaje);
+        }
+
+        function closeSuccessModal() {
+            document.getElementById('successModal').classList.add('hidden');
+        }
+
+        function cargarEstadisticas() {
+            // Aquí puedes cargar estadísticas desde el servidor
+            fetch('../src/vigilante_historial.php?estadisticas=true')
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success && data.ingresos_hoy !== undefined) {
+                        document.getElementById('ingresosHoy').textContent = data.ingresos_hoy;
+                    }
+                })
+                .catch(error => {
+                    console.error('Error cargando estadísticas:', error);
+                });
+        }
+
+        function actualizarEstadisticas() {
+            // Incrementar contador local
+            const statNumber = document.getElementById('ingresosHoy');
+            const current = parseInt(statNumber.textContent) || 0;
+            statNumber.textContent = current + 1;
+
+            // También actualizar en servidor (opcional)
+            console.log("Estadísticas actualizadas");
+        }
+
+    //Funcion historial
+
+        function buscarRegistros() {
+            cargarRegistros();
         }
 
         function cargarRegistros() {
-    const loadingOverlay = document.getElementById('loadingOverlay');
-    const tbody = document.getElementById('records-tbody');
-    const noRecords = document.getElementById('no-records');
-    const recordsInfo = document.getElementById('records-info');
-    
-    loadingOverlay.style.display = 'flex';
-    
-    // Obtener parámetros de filtros
-    const search = document.getElementById('search-input').value || '';
-    const fechaInicio = document.getElementById('fecha-inicio').value || '';
-    const fechaFin = document.getElementById('fecha-fin').value || '';
-    const tipo = document.getElementById('tipo-select').value || '';
-    const rol = document.getElementById('rol-select').value || '';
-    
-    const url = `../src/vigilante_historial.php?search=${encodeURIComponent(search)}`;
-    
-    fetch(url)
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                if (data.registros.length === 0) {
-                    noRecords.classList.remove('hidden');
-                    tbody.innerHTML = '';
-                } else {
-                    noRecords.classList.add('hidden');
-                    tbody.innerHTML = data.registros.map(registro => {
-                        // Formatear fecha y hora
-                        const fecha = new Date(registro.fecha_escaneo);
-                        const fechaFormateada = fecha.toLocaleDateString('es-CO');
-                        const horaFormateada = fecha.toLocaleTimeString('es-CO', { hour: '2-digit', minute: '2-digit' });
-                        
-                        // Determinar tipo de registro
-                        let tipoRegistro = 'Ingreso';
-                        if (registro.tipo_ingreso === 'salida') {
-                            tipoRegistro = 'Salida';
+            const loadingOverlay = document.getElementById('loadingOverlay');
+            const tbody = document.getElementById('records-tbody');
+            const noRecords = document.getElementById('no-records');
+            const recordsInfo = document.getElementById('records-info');
+            const search = document.getElementById('search-input').value || '';
+
+            loadingOverlay.style.display = 'flex';
+            tbody.innerHTML = '';
+
+            fetch(`../src/vigilante_historial.php?search=${encodeURIComponent(search)}`)
+                .then(response => response.json())
+                .then(data => {
+                    loadingOverlay.style.display = 'none';
+
+                    if (data.success) {
+                        if (data.registros.length === 0) {
+                            noRecords.classList.remove('hidden');
+                            tbody.innerHTML = '';
+                        } else {
+                            noRecords.classList.add('hidden');
+
+                            tbody.innerHTML = data.registros.map(registro => {
+                                const fecha = new Date(registro.fecha_escaneo);
+                                const fechaFormateada = fecha.toLocaleDateString('es-CO');
+                                const horaFormateada = fecha.toLocaleTimeString('es-CO', {
+                                    hour: '2-digit',
+                                    minute: '2-digit'
+                                });
+
+                                let tipoRegistro = 'Ingreso';
+                                if (registro.tipo_ingreso === 'salida') {
+                                    tipoRegistro = 'Salida';
+                                }
+
+                                let estadoClass = 'status-completed';
+                                let estadoText = 'Completado';
+
+                                if (registro.estado === 'escaneado') {
+                                    estadoClass = 'status-pending';
+                                    estadoText = 'Pendiente';
+                                } else if (registro.estado === 'en_bienestar') {
+                                    estadoClass = 'status-process';
+                                    estadoText = 'En Bienestar';
+                                } else if (registro.estado === 'en_enfermeria') {
+                                    estadoClass = 'status-attention';
+                                    estadoText = 'En Enfermería';
+                                }
+
+                                return `
+                                    <tr>
+                                        <td>${fechaFormateada}</td>
+                                        <td>${horaFormateada}</td>
+                                        <td>${registro.nombres} ${registro.apellidos}</td>
+                                        <td>${registro.documento}</td>
+                                        <td>${registro.rol}</td>
+                                        <td>${tipoRegistro}</td>
+                                        <td><span class="${estadoClass}">${estadoText}</span></td>
+                                        <td>
+                                            <button class="btn-action btn-view" onclick="verDetalles(${registro.id_ingreso})">
+                                                <i class="fas fa-eye"></i>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                `;
+                            }).join('');
                         }
-                        
-                        // Determinar estado
-                        let estadoClass = 'status-completed';
-                        let estadoText = 'Completado';
-                        
-                        if (registro.estado === 'escaneado') {
-                            estadoClass = 'status-pending';
-                            estadoText = 'Pendiente';
-                        } else if (registro.estado === 'en_bienestar') {
-                            estadoClass = 'status-process';
-                            estadoText = 'En Bienestar';
-                        } else if (registro.estado === 'en_enfermeria') {
-                            estadoClass = 'status-attention';
-                            estadoText = 'En Enfermería';
-                        }
-                        
-                        return `
+
+                        recordsInfo.textContent = `Mostrando ${data.registros.length} registros`;
+                    } else {
+                        tbody.innerHTML = `
                             <tr>
-                                <td>${fechaFormateada}</td>
-                                <td>${horaFormateada}</td>
-                                <td>${registro.nombres} ${registro.apellidos}</td>
-                                <td>${registro.documento}</td>
-                                <td>${registro.rol}</td>
-                                <td>${tipoRegistro}</td>
-                                <td><span class="${estadoClass}">${estadoText}</span></td>
-                                <td>
-                                    <button class="btn-action btn-view" onclick="verDetalles(${registro.id_ingreso})">
-                                        <i class="fas fa-eye"></i>
-                                    </button>
+                                <td colspan="8" style="text-align: center; color: #e74c3c; padding: 20px;">
+                                    Error: ${data.error}
                                 </td>
                             </tr>
                         `;
-                    }).join('');
-                }
-                
-                recordsInfo.textContent = `Mostrando ${data.registros.length} de ${data.total_registros} registros`;
-            } else {
-                console.error('Error al cargar los registros:', data.error);
-                tbody.innerHTML = `
-                    <tr>
-                        <td colspan="8" style="text-align: center; color: #e74c3c; padding: 20px;">
-                            Error al cargar los registros: ${data.error}
-                        </td>
-                    </tr>
-                `;
+                    }
+                })
+                .catch(error => {
+                    loadingOverlay.style.display = 'none';
+                    tbody.innerHTML = `
+                        <tr>
+                            <td colspan="8" style="text-align: center; color: #e74c3c; padding: 20px;">
+                                Error de conexión: ${error.message}
+                            </td>
+                        </tr>
+                    `;
+                });
+        }
+
+        function verDetalles(idIngreso) {
+            console.log("Ver detalles del registro:", idIngreso);
+            // Aquí puedes implementar la funcionalidad para ver detalles
+            mostrarMensajeExito("Detalles del registro " + idIngreso);
+        }
+
+        // ===================== FUNCIONES LOGOUT =====================
+
+        function logoutUser() {
+            if (confirm("¿Estás seguro de que deseas cerrar sesión?")) {
+                window.location.href = '../src/logout.php';
             }
-        })
-        .catch(error => {
-            console.error('Error en la solicitud:', error);
-            tbody.innerHTML = `
-                <tr>
-                    <td colspan="8" style="text-align: center; color: #e74c3c; padding: 20px;">
-                        Error de conexión. Por favor, intenta nuevamente.
-                    </td>
-                </tr>
-            `;
-        })
-        .finally(() => {
-            loadingOverlay.style.display = 'none';
+        }
+
+        function cancelarCerrarSesion() {
+            document.getElementById('logoutModal').classList.add('hidden');
+        }
+
+        function cerrarSesion() {
+            window.location.href = '../src/logout.php';
+        }
+
+        // ===================== FUNCIONES MODALES =====================
+
+        function cerrarModalPersona() {
+            document.getElementById('person-modal').classList.add('hidden');
+        }
+
+        // Inicializar al cargar la página
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log("Dashboard de vigilante cargado");
+            // Cargar estadísticas iniciales
+            cargarEstadisticas();
         });
-}
+
+        function registrarIngreso() {
+            // Implementar función para registrar ingres
+ 
+        }
     </script>
 
 </body>
