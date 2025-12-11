@@ -60,20 +60,18 @@ $evaluados = $conn->query("SELECT COUNT(*) AS evaluados FROM permiso WHERE estad
 </head>
 
 <body>
-    <!-- Debug info -->
 
 
-    <header class="header">
-        <div class="container">
-            <h1>Dashboard Enfermera</h1>
+<header class="header">
+    <div class="container header-flex"> <div class="header-title"> <h1>Dashboard Enfermera</h1>
             <p>Gestión de Aprendices</p>
         </div>
-          <div class="header-right">
-            <button class="logout-btn" onclick="logoutUser()">
+        <div class="header-left"> <button class="logout-btn" onclick="logoutUser()" style="text-align: right;">
                 <i class="fa-solid fa-right-from-bracket"></i> Cerrar sesión
             </button>
         </div>
-    </header>
+    </div>
+</header>
     <main class="container">
 
         <!-- Tarjetas -->
