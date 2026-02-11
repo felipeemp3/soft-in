@@ -1,6 +1,6 @@
 # Documentación Técnica y Funcional del Proyecto **Soft-In**
 
-Soft-In es un sistema web para la gestión de control de acceso, roles, permisos y registro de usuarios en ambientes institucionales (como SENA). Incluye autenticación, dashboards por rol (administrador, aprendiz, bienestar, vigilante, enfermera), generación de códigos QR, historial de ingresos y más.
+Soft-In es un sistema web para la gestión de control de acceso, roles, permisos y registro de usuarios en ambientes institucionales. Incluye autenticación, dashboards por rol (administrador, aprendiz, bienestar, vigilante, enfermera), generación de códigos QR, historial de ingresos y más.
 
 ---
 
