@@ -51,7 +51,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['login-button'])) {
 
                 case 'enfermera':
                     header('Location: ../dashboards/enfermera.php');
-                    exit();  // ← AQUÍ ESTABA EL PROBLEMA
+                    exit();  
 
                 case 'admin':
                     header('Location: ../dashboards/admin.php');
@@ -76,3 +76,4 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['login-button'])) {
     header('Location: ../index.html');
     exit();
 }
+?>

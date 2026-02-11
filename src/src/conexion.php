@@ -1,16 +1,13 @@
 <?php
-$servername = "localhost";
-$username = "root";
-$password = "";
-$dbname = "softin";
+$servername = getenv ('DB_HOST'); 
+$username = getenv('DB_USER');
+$password = getenv('DB_PASSWORD'); 
+$dbname = getenv('DB_NAME');
 
-// Crear conexión
 $conn = new mysqli($servername, $username, $password, $dbname);
 
-// Verificar conexión
 if ($conn->connect_error) {
-    die("La conexión falló: " . $conn->connect_error);
+    die("Error al conectar la base de datos: " . $conn->connect_error);
 }
-// Opcional: Establecer charset
-$conn->set_charset("utf8mb4"); 
+/// echo "¡Estoy conectado al local de la base de datos!";
 ?>

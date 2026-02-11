@@ -8,6 +8,12 @@ services:
       - "8080:80"
     volumes:
       - ./src:/var/www/html
+    # Las variables de entorno para la conexión a la base de datos, que se usarán en el código PHP
+    environment:
+      DB_HOST: db
+      DB_USER: ${DB_USER}
+      DB_PASSWORD: ${DB_PASSWORD}
+      DB_NAME: ${DB_NAME}
     depends_on:
       - db
 
@@ -16,19 +22,23 @@ services:
     image: mysql:8.0
     restart: always
     environment:
-      MYSQL_PASSWORD:  ${DB_PASSWORD}
-      MYSQL_USER:       ${DB_USER}
-      MYSQL_DATABASE:  ${DB_NAME}
+      # Estas variables son necesarias para configurar MySQL, y las estamos tomando del .env
+      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD} 
+      MYSQL_DATABASE: ${DB_NAME}
+      MYSQL_USER: ${DB_USER}
+
+      MYSQL_PASSWORD: ${DB_PASSWORD}
     volumes:
       - db_data:/var/lib/mysql
 
-  # phpMyAdmin (Para gestionar la BD visualmente)
+  # phpMyAdmin para gestionar la base de datos
   phpmyadmin:
     image: phpmyadmin/phpmyadmin
     ports:
       - "8081:80"
     environment:
       PMA_HOST: db
+      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
 
 volumes:
   db_data:
